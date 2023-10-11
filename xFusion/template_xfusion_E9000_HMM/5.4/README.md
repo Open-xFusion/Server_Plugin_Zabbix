@@ -6,7 +6,7 @@ I. General Information
 
     Name:     Zabbix Plugin Packsage for xFusion Server
     Function: Query, Monitoring
-    Version:  2.1
+    Version:  2.3
 
 	
 II. Description
@@ -29,8 +29,8 @@ III. Compatibility Information
       <td>HMM</td>
       <td>Zabbix 5.4</td>
       <td>HMM V686D or later</td>
-      <td>Blade server: E9000</td>
-      <td>SNMP v2c</td>
+      <td>Blade server: E9000(MM910)</td>
+      <td>SNMP v2</td>
    </tr>
 </table>
 

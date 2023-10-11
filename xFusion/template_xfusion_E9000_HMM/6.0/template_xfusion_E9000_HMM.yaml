@@ -568,7 +568,7 @@ zabbix_export:
       macros:
         -
           macro: '{$SNMP_COMMUNITY}'
-          value: 'xFusion12#$'
+          value: 'Admin@9000'
         -
           macro: '{$SNMP_PORT}'
           value: '161'
