@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-08-03T06:46:30Z</date>
+    <date>2023-08-24T02:19:12Z</date>
     <groups>
         <group>
             <name>xFusion Server</name>
@@ -18,6 +18,9 @@
             </groups>
             <applications>
                 <application>
+                    <name>BusinessPort</name>
+                </application>
+                <application>
                     <name>CPU</name>
                 </application>
                 <application>
@@ -27,10 +30,25 @@
                     <name>Fan</name>
                 </application>
                 <application>
+                    <name>Firmware</name>
+                </application>
+                <application>
                     <name>HardDisk</name>
                 </application>
                 <application>
+                    <name>LogicalDrive</name>
+                </application>
+                <application>
                     <name>Memory</name>
+                </application>
+                <application>
+                    <name>NetCard</name>
+                </application>
+                <application>
+                    <name>OCPCard</name>
+                </application>
+                <application>
+                    <name>PCIeDevice</name>
                 </application>
                 <application>
                     <name>PowerSupply</name>
@@ -97,7 +115,7 @@
                     <type>SNMP_AGENT</type>
                     <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.1.7.0</snmp_oid>
                     <key>deviceSerialNo</key>
-                    <delay>86400s</delay>
+                    <delay>60s</delay>
                     <history>30d</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
@@ -108,6 +126,14 @@
                             <name>System</name>
                         </application>
                     </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata(300s)}=1</expression>
+                            <name>Server {HOST.NAME} No data for &gt; 5 minutes</name>
+                            <priority>HIGH</priority>
+                            <description>Abnormal BMC connection, please check the network interface of the network card</description>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>diskPartitionUsagethreshold</name>
@@ -116,8 +142,7 @@
                     <key>diskPartitionUsage</key>
                     <delay>600s</delay>
                     <units>%</units>
-                    <description>Percent of hard disk partition usage threshold.&#13;
- 	This value is in [0,100].</description>
+                    <description>Percent of hard disk partition usage threshold.</description>
                     <applications>
                         <application>
                             <name>System</name>
@@ -209,6 +234,62 @@
                     </valuemap>
                 </item>
                 <item>
+                    <name>OCPCardEntireStatus</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.1.0</snmp_oid>
+                    <key>OCPCardEntireStatus</key>
+                    <delay>600s</delay>
+                    <applications>
+                        <application>
+                            <name>EntireStatus</name>
+                        </application>
+                    </applications>
+                    <valuemap>
+                        <name>xFusion server OCPCardStatus</name>
+                    </valuemap>
+                </item>
+                <item>
+                    <name>OCPCardMaxNum</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.2.0</snmp_oid>
+                    <key>OCPCardMaxNum</key>
+                    <delay>600s</delay>
+                    <applications>
+                        <application>
+                            <name>OCPCard</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>PCIeDeviceEntireStatus</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.1.0</snmp_oid>
+                    <key>PCIeDeviceEntireStatus</key>
+                    <delay>600s</delay>
+                    <description>Information about all PCIe health status.</description>
+                    <applications>
+                        <application>
+                            <name>EntireStatus</name>
+                        </application>
+                    </applications>
+                    <valuemap>
+                        <name>xFusion server PCIeDeviceStatus</name>
+                    </valuemap>
+                </item>
+                <item>
+                    <name>PCIeDeviceMaxNum</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.2.0</snmp_oid>
+                    <key>PCIeDeviceMaxNum</key>
+                    <delay>600s</delay>
+                    <description>Maximum number of PCIe cards.</description>
+                    <applications>
+                        <application>
+                            <name>PCIeDevice</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
                     <name>peakPower</name>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.20.1.0</snmp_oid>
@@ -228,8 +309,8 @@
                     <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.20.4.0</snmp_oid>
                     <key>powerConsumption</key>
                     <delay>600s</delay>
+                    <trends>0</trends>
                     <value_type>FLOAT</value_type>
-                    <units>kWh</units>
                     <description>Power consume from power statistic start time, unit is kWh.</description>
                     <applications>
                         <application>
@@ -292,6 +373,8 @@
                     <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.1.23.0</snmp_oid>
                     <key>systemCpuUsage</key>
                     <delay>600s</delay>
+                    <trends>0</trends>
+                    <value_type>FLOAT</value_type>
                     <units>%</units>
                     <description>Percent of CPU usage.&#13;
  	The value defined as:&#13;
@@ -302,9 +385,6 @@
                             <name>System</name>
                         </application>
                     </applications>
-                    <valuemap>
-                        <name>xFusion server invalid CPU usage</name>
-                    </valuemap>
                 </item>
                 <item>
                     <name>systemGuid</name>
@@ -386,12 +466,12 @@
                     </valuemap>
                 </item>
                 <item>
-                    <name>Inlet Temperature</name>
+                    <name>Inlet Temperature(°C)</name>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.26.50.1.3.1</snmp_oid>
                     <key>temperatureVlue</key>
                     <delay>600s</delay>
-                    <units>°C</units>
+                    <description>If power off, the CPU temperature cannot be readable and is set to 65535.</description>
                     <applications>
                         <application>
                             <name>Temperature</name>
@@ -402,10 +482,307 @@
                             <type>MULTIPLIER</type>
                             <params>0.1</params>
                         </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <params>6553
+65535</params>
+                        </step>
                     </preprocessing>
                 </item>
             </items>
             <discovery_rules>
+                <discovery_rule>
+                    <name>businessPortBDF</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]</snmp_oid>
+                    <key>businessPortBDF-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Business portBDF</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>businessPort [{#SNMPINDEX}] BDF</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.43.50.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>businessPortBDF[{#SNMPINDEX}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>BusinessPort</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>businessPortLinkStatus</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.4]</snmp_oid>
+                    <key>businessPortLinkStatus-[{#SNMPINDEX}]</key>
+                    <delay>60s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>BusinessPort[{#SNMPINDEX}] LinkStatus</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.43.50.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>BusinessPortLinkStatus[{#SNMPINDEX}]</key>
+                            <delay>600s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>BusinessPort</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>NoLink
+Disconnected</params>
+                                </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>LinkUp
+Connected</params>
+                                </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>LinkDown
+Disconnected</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=&quot;Disconnected&quot;&#13;
+and {change()}=1</expression>
+                                    <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                                    <recovery_expression>{last()}=&quot;Connected&quot;</recovery_expression>
+                                    <name>BusinessPort[{#SNMPINDEX}]  Disconnected</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>BusinessPort</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>businessPortLocation</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]</snmp_oid>
+                    <key>businessPortLocation-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>businessPort [{#SNMPINDEX}] Location</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.43.50.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>businessPortLocation[{#SNMPINDEX}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about businessport belongs to which netcard.</description>
+                            <applications>
+                                <application>
+                                    <name>BusinessPort</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>businessPortMacAddr</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]</snmp_oid>
+                    <key>businessPortMacAddr-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Business port MAC address.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>BusinessPort[{#SNMPINDEX}] MacAddr</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.43.50.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>businessPortMacAddr[{#SNMPINDEX}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Business port MAC address.</description>
+                            <applications>
+                                <application>
+                                    <name>BusinessPort</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>businessPortOSLinkStatus</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]</snmp_oid>
+                    <key>businessPortOSLinkStatus-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Business port link status reported by OS. The status will be&#13;
+N/A if iBMA is not installed.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>businessPort [{#SNMPINDEX}] OSLinkStatus</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.43.50.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>businessPortOSLinkStatus[{#SNMPINDEX}]</key>
+                            <delay>600s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Business port link status reported by OS. The status will be N/A if iBMA is not installed.</description>
+                            <applications>
+                                <application>
+                                    <name>BusinessPort</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>NoLink
+Disconnected</params>
+                                </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>LinkUp
+Connected</params>
+                                </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>LinkDown
+Disconnected</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=&quot;Disconnected&quot; and {change()}=1</expression>
+                                    <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                                    <recovery_expression>{last()}=&quot;Connected&quot;</recovery_expression>
+                                    <name>BusinessPort[{#SNMPINDEX}]  OSLinkStatus</name>
+                                    <opdata>BusinessPortOSLinkStatust[{#SNMPINDEX}]</opdata>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>BusinessPort</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>businessPortSilkNum</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]</snmp_oid>
+                    <key>businessPortSilkNum-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about business port silk number within a netcard.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>businessPort {#SNMPVALUE} SilkNum</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.43.50.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>businessPortSilkNum[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <description>Information about business port silk number within a netcard.</description>
+                            <applications>
+                                <application>
+                                    <name>BusinessPort</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>cpuClockRate</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]</snmp_oid>
+                    <key>cpuClockRate-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about CPU clock rate</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>cpu {#SNMPVALUE} ClockRate</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.15.50.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>cpuClockRate[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>CPU</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>cpuFamily</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]</snmp_oid>
+                    <key>cpuFamily-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about CPU family</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>cpu {#SNMPVALUE} Family</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.15.50.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>cpuFamily[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>CPU</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>cpuManufacturer</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]</snmp_oid>
+                    <key>cpuManufacturer-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about CPU manufacturer</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>cpu {#SNMPVALUE} Manufacturer</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.15.50.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>cpuManufacturer[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>CPU</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
                 <discovery_rule>
                     <name>cpuStatus</name>
                     <type>SNMP_AGENT</type>
@@ -413,7 +790,7 @@
                     <key>cpuStatus-[{#SNMPVALUE}]</key>
                     <delay>3600s</delay>
                     <lifetime>0d</lifetime>
-                    <description>Information about CPU index.</description>
+                    <description>Information about CPU health status.</description>
                     <item_prototypes>
                         <item_prototype>
                             <name>cpu {#SNMPVALUE} Status</name>
@@ -448,6 +825,54 @@
                                     <priority>WARNING</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>cpuType</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]</snmp_oid>
+                    <key>cpuType-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about CPU type.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>cpu {#SNMPVALUE} Type</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.15.50.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>cpuType[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>CPU</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>fanSpeed</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.8.50.1.1]</snmp_oid>
+                    <key>fanSpeed-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>fan {#SNMPVALUE} Speed</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.8.50.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>fanSpeed[{#SNMPVALUE}]</key>
+                            <delay>600s</delay>
+                            <units>rpm</units>
+                            <applications>
+                                <application>
+                                    <name>Fan</name>
+                                </application>
+                            </applications>
                         </item_prototype>
                     </item_prototypes>
                 </discovery_rule>
@@ -496,6 +921,194 @@
                     </item_prototypes>
                 </discovery_rule>
                 <discovery_rule>
+                    <name>firmwareLocation</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.11.50.1.1]</snmp_oid>
+                    <key>firmwareLocation-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about firmware location</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>firmware {#SNMPVALUE} Location</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.11.50.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>firmwareLocation[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>Firmware</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>firmwareReleaseDate</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.11.50.1.1]</snmp_oid>
+                    <key>firmwareReleaseDate-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about firmware release date.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>firmware {#SNMPVALUE} ReleaseDate</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.11.50.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>firmwareReleaseDate[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>Firmware</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>firmwareVersion</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.11.50.1.1]</snmp_oid>
+                    <key>firmwareVersion-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>firmware {#SNMPVALUE} Version</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.11.50.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>firmwareVersion[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>firmware Version</description>
+                            <applications>
+                                <application>
+                                    <name>Firmware</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>hardDiskCapacityInGB(GB)</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]</snmp_oid>
+                    <key>hardDiskCapacityInGB-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>hardDisk {#SNMPVALUE} CapacityInGB(GB)</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.18.50.1.12.{#SNMPINDEX}</snmp_oid>
+                            <key>hardDiskCapacityInGB[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Hard disk capacity (GB)&#13;
+1:unknown(-1)</description>
+                            <applications>
+                                <application>
+                                    <name>HardDisk</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JAVASCRIPT</type>
+                                    <params>return value+&quot;GB&quot;</params>
+                                </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>-1GB
+unkown</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>hardDiskManufacturer</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]</snmp_oid>
+                    <key>hardDiskManufacturer-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>hardDisk {#SNMPVALUE} Manufacturer</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.18.50.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>hardDiskManufacturer[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>HardDisk</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>hardDiskModelNumber</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]</snmp_oid>
+                    <key>hardDiskModelNumber-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Harddisk model number.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>hardDisk {#SNMPVALUE} ModelNumber</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.18.50.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>hardDiskModelNumber[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Harddisk model number.</description>
+                            <applications>
+                                <application>
+                                    <name>HardDisk</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>hardDiskSerialNumber</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]</snmp_oid>
+                    <key>hardDiskSerialNumber-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Harddisk serial number.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>hardDisk {#SNMPVALUE} Serial Number</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.18.50.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>hardDiskSerialNumber[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Harddisk serial number.</description>
+                            <applications>
+                                <application>
+                                    <name>HardDisk</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
                     <name>hardDiskStatus</name>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]</snmp_oid>
@@ -536,6 +1149,417 @@
                                     <priority>WARNING</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>logicalDriveName</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.37.50.1.1]</snmp_oid>
+                    <key>logicalDriveName-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about logical drive name.[X.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>logicalDrive {#SNMPINDEX} Name</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.37.50.1.19.{#SNMPINDEX}</snmp_oid>
+                            <key>logicalDriveName[{#SNMPINDEX}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about logical drive name,[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2</description>
+                            <applications>
+                                <application>
+                                    <name>LogicalDrive</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>logicalDriveRaidLevel</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.37.50.1.1]</snmp_oid>
+                    <key>logicalDriveRaidLevel-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <description>Information about logical drive RAID level.[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>logicalDrive {#SNMPINDEX} RaidLevel</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.37.50.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>logicalDriveRaidLevel[{#SNMPINDEX}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about logical drive RAID level.[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2</description>
+                            <applications>
+                                <application>
+                                    <name>LogicalDrive</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>logicalDriveSize(MB)</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.37.50.1.1]</snmp_oid>
+                    <key>logicalDriveSize-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <description>Information about logical drive size,[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>logicalDrive {#SNMPINDEX} Size(MB)</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.37.50.1.15.{#SNMPINDEX}</snmp_oid>
+                            <key>logicalDriveSize[{#SNMPINDEX}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about logical drive size (MB).[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2</description>
+                            <applications>
+                                <application>
+                                    <name>LogicalDrive</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JAVASCRIPT</type>
+                                    <params>return value+&quot;MB&quot;</params>
+                                </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>-1MB
+unkown</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>logicalDriveState</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.37.50.1.1]</snmp_oid>
+                    <key>logicalDriveState-[{#SNMPINDEX}]</key>
+                    <delay>3600s</delay>
+                    <description>Information about logical drive state,[X.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>logicalDrive {#SNMPINDEX} State</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.37.50.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>logicalDriveState[{#SNMPINDEX}]</key>
+                            <delay>600s</delay>
+                            <description>Information about logical drive state,[X.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2</description>
+                            <applications>
+                                <application>
+                                    <name>LogicalDrive</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>xFusion server logicalDriveState</name>
+                            </valuemap>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=1</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state critical</name>
+                                    <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=5</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state critical</name>
+                                    <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=15</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state critical</name>
+                                    <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=25</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state critical</name>
+                                    <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=28</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state critical</name>
+                                    <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=6</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=7</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=8</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=9</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=10</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=11</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=12</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=13</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=14</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=16</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=17</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=20</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=21</expression>
+                                    <name>logicalDrive[{#SNMPVALUE}] state minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>LogicalDrive</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>memoryClockRate</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.16.50.1.1]</snmp_oid>
+                    <key>memoryClockRate-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Information about memory clock rate.The units MHz.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>memory {#SNMPVALUE} ClockRate</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.16.50.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>memoryClockRate[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about memory clock rate.The units MHz.</description>
+                            <applications>
+                                <application>
+                                    <name>Memory</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>memoryManufacturer</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.16.50.1.1]</snmp_oid>
+                    <key>memoryManufacturer-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>memory {#SNMPVALUE} Manufacturer</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.16.50.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>memoryManufacturer[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about memory manufacturer.</description>
+                            <applications>
+                                <application>
+                                    <name>Memory</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>memorySize</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.16.50.1.1]</snmp_oid>
+                    <key>memorySize-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>memory {#SNMPVALUE} Size</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.16.50.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>MemorySize[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about memory capacity.</description>
+                            <applications>
+                                <application>
+                                    <name>Memory</name>
+                                </application>
+                            </applications>
                         </item_prototype>
                     </item_prototypes>
                 </discovery_rule>
@@ -584,6 +1608,670 @@
                     </item_prototypes>
                 </discovery_rule>
                 <discovery_rule>
+                    <name>netCardLocation</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.25.50.1.1]</snmp_oid>
+                    <key>netCardLocation-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <description>Netcard physical Location.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>netCard {#SNMPVALUE} Location</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.25.50.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>NetCardLocation[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Netcard physical Location.</description>
+                            <applications>
+                                <application>
+                                    <name>NetCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>netCardNICName</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.25.50.1.1]</snmp_oid>
+                    <key>netCardNICName-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>netCardNIC {#SNMPVALUE} Name</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.25.50.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>netCardNICName[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>NetCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>netCardStatus</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.25.50.1.1]</snmp_oid>
+                    <key>netCardStatus-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>netCard {#SNMPVALUE} Status</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.25.50.1.18.{#SNMPINDEX}</snmp_oid>
+                            <key>netCardStatus[{#SNMPVALUE}]</key>
+                            <delay>600s</delay>
+                            <applications>
+                                <application>
+                                    <name>NetCard</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>xFusion server netCardStatus</name>
+                            </valuemap>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=4</expression>
+                                    <name>netCard [{#SNMPVALUE}] status critical</name>
+                                    <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>NetCard</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>netCard [{#SNMPVALUE}] status major</name>
+                                    <priority>HIGH</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>NetCard</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>netCard [{#SNMPVALUE}] status minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>NetCard</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardAvailability</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardAvailability-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} Availability</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardAvailability[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>xFusion server OCPCardAvailability</name>
+                            </valuemap>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardDescription</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardDescription-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} Description</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.11.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardDescription[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardDID</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardDID-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} DID</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardDID[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardFunction</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardFunction-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} Function</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardFunction[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardLocation</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardLocation-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} Location</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardLocation[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardManufacturer</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardManufacturer-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} Manufacturer</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.10.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardManufacturer[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardName</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardName-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} Name</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardName[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardPresence</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardPresence-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} Presence</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardPresence[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>xFusion server OCPCardPresence</name>
+                            </valuemap>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardStatus</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardStatus-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} Status</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardStatus[{#SNMPVALUE}]</key>
+                            <delay>600s</delay>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>xFusion server OCPCardStatus</name>
+                            </valuemap>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=4</expression>
+                                    <name>OCPCard [{#SNMPVALUE}] status critical</name>
+                                    <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>OCPCard</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>OCPCard [{#SNMPVALUE}] status major</name>
+                                    <priority>HIGH</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>OCPCard</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>OCPCard [{#SNMPVALUE}] status minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>OCPCard</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OCPCardVID</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]</snmp_oid>
+                    <key>OCPCardVID-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OCPCard {#SNMPVALUE} VID</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.46.50.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>OCPCardVID[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <applications>
+                                <application>
+                                    <name>OCPCard</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceAvailability</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceAvailability-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} Availability</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceAvailability[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>xFusion server PCIeAvailability</name>
+                            </valuemap>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceDescription</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceDescription-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} Description</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.11.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceDescription[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceDevicename</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceDevicename-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} Devicename</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceDevicename[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceDID</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceDID-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} DID</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceDID[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceFunction</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceFunction-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} Function</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceFunction[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceLocation</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceLocation-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} Location</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceLocation[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceManufacturer</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceManufacturer-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} Manufacturer</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.10.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceManufacturer[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDevicePresence</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDevicePresence-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} Presence</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDevicePresence[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <description>Information about PCIe presence.</description>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>xFusion server PCIeDevicePresence</name>
+                            </valuemap>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceStatus</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceStatus-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} Status</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceStatus[{#SNMPVALUE}]</key>
+                            <delay>600s</delay>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>xFusion server PCIeDeviceStatus</name>
+                            </valuemap>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=4</expression>
+                                    <name>PCIeDevice [{#SNMPVALUE}] status critical</name>
+                                    <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>PCIeDevice</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>PCIeDevice [{#SNMPVALUE}] status major</name>
+                                    <priority>HIGH</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>PCIeDevice</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>PCIeDevice [{#SNMPVALUE}] status minor</name>
+                                    <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>PCIeDevice</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>PCIeDeviceVID</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]</snmp_oid>
+                    <key>PCIeDeviceVID-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>PCIeDevice {#SNMPVALUE} VID</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.24.50.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>PCIeDeviceVID[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <applications>
+                                <application>
+                                    <name>PCIeDevice</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>powerSupplyInputPower</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.6.50.1.1]</snmp_oid>
+                    <key>powerSupplyInputPower-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>powerSupply {#SNMPVALUE} InputPower</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.6.50.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>powerSupplyInputPower[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <units>W</units>
+                            <applications>
+                                <application>
+                                    <name>PowerSupply</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
                     <name>powerSupplyStatus</name>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.6.50.1.1]</snmp_oid>
@@ -625,6 +2313,56 @@
                                     <priority>WARNING</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>raidControllerFwVersion</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.36.50.1.1]</snmp_oid>
+                    <key>raidControllerFwVersion-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>raidController {#SNMPVALUE} FwVersion</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.36.50.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>raidControllerFwVersion[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about RAID controller firmware version.</description>
+                            <applications>
+                                <application>
+                                    <name>RaidController</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>raidControllerName</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.36.50.1.1]</snmp_oid>
+                    <key>raidControllerName-[{#SNMPVALUE}]</key>
+                    <delay>3600s</delay>
+                    <lifetime>0d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>raidController {#SNMPVALUE} Name</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.36.50.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>raidControllerName[{#SNMPVALUE}]</key>
+                            <delay>86400s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>Information about RAID controller name.</description>
+                            <applications>
+                                <application>
+                                    <name>RaidController</name>
+                                </application>
+                            </applications>
                         </item_prototype>
                     </item_prototypes>
                 </discovery_rule>
@@ -683,16 +2421,17 @@
                         </conditions>
                     </filter>
                     <lifetime>0d</lifetime>
+                    <description>If power off, the CPU temperature cannot be readable and is set to 65535.</description>
                     <item_prototypes>
                         <item_prototype>
-                            <name>{#SNMPITEM} Temperature</name>
+                            <name>{#SNMPITEM} Temperature(°C)</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>1.3.6.1.4.1.58132.2.235.1.1.26.50.1.3.{#SNMPINDEX}</snmp_oid>
                             <key>temperatureVlue[{#SNMPVALUE}]</key>
                             <delay>600s</delay>
                             <history>7d</history>
                             <trends>90d</trends>
-                            <units>°C</units>
+                            <description>If power off, the CPU temperature cannot be readable and is set to 65535.</description>
                             <applications>
                                 <application>
                                     <name>Temperature</name>
@@ -703,6 +2442,11 @@
                                     <type>MULTIPLIER</type>
                                     <params>0.1</params>
                                 </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <params>6553
+65535</params>
+                                </step>
                             </preprocessing>
                         </item_prototype>
                     </item_prototypes>
@@ -711,7 +2455,6 @@
                             <name>{#SNMPITEM} Temperature</name>
                             <graph_items>
                                 <graph_item>
-                                    <color>1A7C11</color>
                                     <item>
                                         <host>xFusion Server iBMC Template</host>
                                         <key>temperatureVlue[{#SNMPVALUE}]</key>
@@ -725,7 +2468,7 @@
             <macros>
                 <macro>
                     <macro>{$SNMP_COMMUNITY}</macro>
-                    <value>xFusion12#$</value>
+                    <value>Admin@9000</value>
                 </macro>
                 <macro>
                     <macro>{$SNMP_PORT}</macro>
@@ -923,24 +2666,164 @@
             </mappings>
         </value_map>
         <value_map>
-            <name>xFusion server invalid CPU usage</name>
-            <mappings>
-                <mapping>
-                    <value>65535 %</value>
-                    <newvalue>invalid current CPU usage</newvalue>
-                </mapping>
-                <mapping>
-                    <value>65536</value>
-                    <newvalue>invalid current CPU usage</newvalue>
-                </mapping>
-            </mappings>
-        </value_map>
-        <value_map>
             <name>xFusion server invalid Memory usage</name>
             <mappings>
                 <mapping>
                     <value>65536</value>
                     <newvalue>invalid current memory usage</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>xFusion server logicalDriveState</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>offline</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>partialdegraded</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>degraded</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>optimal</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>failed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>Not Configured</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>Interim recovery</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>Ready for recovery</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>Recovering</newvalue>
+                </mapping>
+                <mapping>
+                    <value>10</value>
+                    <newvalue>Wrong drive replaced</newvalue>
+                </mapping>
+                <mapping>
+                    <value>11</value>
+                    <newvalue>Drive improperly connected</newvalue>
+                </mapping>
+                <mapping>
+                    <value>12</value>
+                    <newvalue>Expanding</newvalue>
+                </mapping>
+                <mapping>
+                    <value>13</value>
+                    <newvalue>Not available</newvalue>
+                </mapping>
+                <mapping>
+                    <value>14</value>
+                    <newvalue>Queued for expansion</newvalue>
+                </mapping>
+                <mapping>
+                    <value>15</value>
+                    <newvalue>Disabled from scsi id conflict</newvalue>
+                </mapping>
+                <mapping>
+                    <value>16</value>
+                    <newvalue>Ejected</newvalue>
+                </mapping>
+                <mapping>
+                    <value>17</value>
+                    <newvalue>Erase-in-progress</newvalue>
+                </mapping>
+                <mapping>
+                    <value>18</value>
+                    <newvalue>Unused</newvalue>
+                </mapping>
+                <mapping>
+                    <value>19</value>
+                    <newvalue>Ready to perform predictive spare rebuild</newvalue>
+                </mapping>
+                <mapping>
+                    <value>20</value>
+                    <newvalue>RPI in progress</newvalue>
+                </mapping>
+                <mapping>
+                    <value>21</value>
+                    <newvalue>RPI queued</newvalue>
+                </mapping>
+                <mapping>
+                    <value>22</value>
+                    <newvalue>Encrypted without key</newvalue>
+                </mapping>
+                <mapping>
+                    <value>23</value>
+                    <newvalue>Encryption migration</newvalue>
+                </mapping>
+                <mapping>
+                    <value>24</value>
+                    <newvalue>Encrypted with re-keying</newvalue>
+                </mapping>
+                <mapping>
+                    <value>25</value>
+                    <newvalue>Encrypted with encryption off</newvalue>
+                </mapping>
+                <mapping>
+                    <value>26</value>
+                    <newvalue>Volume encode requested</newvalue>
+                </mapping>
+                <mapping>
+                    <value>27</value>
+                    <newvalue>Encrypted with re-key requested</newvalue>
+                </mapping>
+                <mapping>
+                    <value>28</value>
+                    <newvalue>Unsupported on this controller</newvalue>
+                </mapping>
+                <mapping>
+                    <value>29</value>
+                    <newvalue>Not Formatted</newvalue>
+                </mapping>
+                <mapping>
+                    <value>30</value>
+                    <newvalue>Formatting</newvalue>
+                </mapping>
+                <mapping>
+                    <value>31</value>
+                    <newvalue>Sanitizing</newvalue>
+                </mapping>
+                <mapping>
+                    <value>32</value>
+                    <newvalue>Initializing</newvalue>
+                </mapping>
+                <mapping>
+                    <value>33</value>
+                    <newvalue>Initialize failed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>34</value>
+                    <newvalue>Deleting</newvalue>
+                </mapping>
+                <mapping>
+                    <value>35</value>
+                    <newvalue>Delete failed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>36</value>
+                    <newvalue>Write-protect</newvalue>
+                </mapping>
+                <mapping>
+                    <value>255</value>
+                    <newvalue>unknown</newvalue>
                 </mapping>
             </mappings>
         </value_map>
@@ -966,6 +2849,161 @@
                 <mapping>
                     <value>5</value>
                     <newvalue>absence</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>xFusion server netCardStatus</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>ok</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>minor</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>major</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>critical</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>xFusion server OCPCardAvailability</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>disabled</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>backup</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>active</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>xFusion server OCPCardPresence</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>absence</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>presence</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>xFusion server OCPCardStatus</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>ok</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>minor</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>major</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>critical</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>absebce</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>xFusion server PCIeAvailability</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>disabled</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>backup</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>active</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>xFusion server PCIeDevicePresence</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>absence</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>presence</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>xFusion server PCIeDeviceStatus</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>ok</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>minor</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>major</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>critical</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>absebce</newvalue>
                 </mapping>
                 <mapping>
                     <value>6</value>

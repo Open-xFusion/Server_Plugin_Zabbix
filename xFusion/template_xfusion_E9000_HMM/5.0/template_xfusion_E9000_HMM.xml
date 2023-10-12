@@ -644,7 +644,7 @@
             <macros>
                 <macro>
                     <macro>{$SNMP_COMMUNITY}</macro>
-                    <value>xFusion12#$</value>
+                    <value>Admin@9000</value>
                 </macro>
                 <macro>
                     <macro>{$SNMP_PORT}</macro>
