@@ -1,0 +1,31 @@
+{
+    "Rules": [
+        {
+            "FilePath": "",
+            "ExcludePath": ".git|brand_switch.py|brand_switch.json|brand_switch.log",
+            "FileSuffix": ".sh|.md|.xml|.yaml",
+            "StringReplace": {
+                "xFusion Zabbix plug-in": "Kunlun Zabbix plug-in",
+                "https://github.com/Open-xFusion": "https://github.com/Open-Kunlun",
+                "xFusion_Zabbix_Template_": "Kunlun_Zabbix_Template_",
+                "xFusion V5 Server": "Kunlun V5 Server",
+                "xFusion Server": "Kunlun Server",
+                "xFusion Device": "Kunlun Device",
+                "xFusion server": "Kunlun server",
+                "Default value is xFusion": "Default value is Kunlun",
+                "1.3.6.1.4.1.58132": "1.3.6.1.4.1.58132"
+            },
+            "FileRename": {
+                "template_xfusion_E9000_HMM": "template_kunlun_E9000_HMM",
+                "template_xfusion_E9000_HMM.xml": "template_kunlun_E9000_HMM.xml",
+                "template_xfusion_E9000_HMM.yaml": "template_kunlun_E9000_HMM.yaml",
+                "template_xfusion_iBMC": "template_kunlun_iBMC",
+                "template_xfusion_iBMC.xml": "template_kunlun_iBMC.xml",
+                "template_xfusion_iBMC.yaml": "template_kunlun_iBMC.yaml",
+                "template_xfusion_iBMC_v3v5": "template_kunlun_iBMC_v3v5",
+                "template_xfusion_iBMC_v3v5.xml": "template_kunlun_iBMC_v3v5.xml",
+                "template_xfusion_iBMC_v3v5.yaml": "template_kunlun_iBMC_v3v5.yaml"
+            }
+        }
+    ]
+}

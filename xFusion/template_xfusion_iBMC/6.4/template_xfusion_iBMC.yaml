@@ -1,21 +1,16 @@
 zabbix_export:
-  version: '6.0'
-  date: '2023-08-10T08:05:02Z'
-  groups:
-    -
-      uuid: 9d25945b1e5844ecaceab761619ae547
+  version: '6.4'
+  template_groups:
+    - uuid: c0de0cb5e94646f7b3cbf25c3cb8c0a3
       name: 'xFusion Server'
   templates:
-    -
-      uuid: 5e78fe6fe2804510ac8317b1bfef45ad
+    - uuid: 0b6615d127224b039a94fa5719152f9c
       template: 'xFusion Server iBMC Template'
       name: 'xFusion Server iBMC Template'
       groups:
-        -
-          name: 'xFusion Server'
+        - name: 'xFusion Server'
       items:
-        -
-          uuid: 7575f67d8a7c4a29929cb34522d833e3
+        - uuid: a5fcc8c7df4b4fe68e8cc9416bf1e8aa
           name: averagePower
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.20.3.0
@@ -23,11 +18,9 @@ zabbix_export:
           delay: 600s
           units: W
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 40344b44ef5c4d0894a5fe387a1dab68
+        - uuid: 7423ea6669594065b80d31e4867d4296
           name: cpuEntireStatus
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.15.1.0
@@ -37,11 +30,9 @@ zabbix_export:
           valuemap:
             name: 'xFusion server cpuEntireStatus'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: EntireStatus
-        -
-          uuid: 5a0991e7c8634472819b92ce91037dd7
+        - uuid: 4eb7861438f044a589f2a834cd02aefc
           name: deviceName
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.6.0
@@ -53,11 +44,9 @@ zabbix_export:
           description: 'The device name value between 1 to 63 characters.'
           inventory_link: TYPE
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 57aebbbf272045daa1c0a4eac5b1bbb8
+        - uuid: 8b1be373f76648d3969b802ce5259d13
           name: deviceSerialNo
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.7.0
@@ -69,18 +58,15 @@ zabbix_export:
           description: 'The device serial number value between 1 to 63 characters.'
           inventory_link: SERIALNO_A
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
           triggers:
-            -
-              uuid: 5e3a73af7f074d728a10cbfeb8454c3f
+            - uuid: 880320935de74df9962ec14e7c7c0aec
               expression: 'nodata(/xFusion Server iBMC Template/deviceSerialNo,300s)=1'
               name: 'Server {HOST.NAME} No data for > 5 minutes'
               priority: HIGH
               description: 'Abnormal BMC connection, please check the network interface of the network card'
-        -
-          uuid: b92aa46e52fc43f499fc7e4e6ecfd1bd
+        - uuid: e31b0603021b4924a11587857abaeb5b
           name: diskPartitionUsagethreshold
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.28.0
@@ -91,11 +77,9 @@ zabbix_export:
             Percent of hard disk partition usage threshold.
              	This value is in [0,100].
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 2f30d78c2ebf407b8f9001d5648f20cd
+        - uuid: b7e22f3772f3476195564eca2aec459b
           name: ethMACAddress
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.12.50.1.6.1
@@ -107,11 +91,9 @@ zabbix_export:
           description: 'Information about MAC address.'
           inventory_link: MACADDRESS_A
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 56ace1e27dd7446a986fadea40c10871
+        - uuid: d7068ae7ead04462a963d0ab1d7d3222
           name: fanEntireStatus
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.8.3.0
@@ -121,11 +103,9 @@ zabbix_export:
           valuemap:
             name: 'xFusion server fanEntireStatus'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: EntireStatus
-        -
-          uuid: 5cc55e892441472891f348c4bd862b2d
+        - uuid: a74fe04bed8e432592a3a5ccad1fee0e
           name: hardDiskEntireStatus
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.18.1.0
@@ -135,11 +115,9 @@ zabbix_export:
           valuemap:
             name: 'xFusion server hardDiskEntireStatus'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: EntireStatus
-        -
-          uuid: a14f8400c1364d43abcbd5deef244041
+        - uuid: cc1eaa3988504ac497b37227782f1e07
           name: hostName
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.9.0
@@ -154,11 +132,9 @@ zabbix_export:
              	Default value is xFusion.
           inventory_link: NAME
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: de9e2ca0bc65442b8ae995d5ba878e8c
+        - uuid: f09239fc10ab4600a89831273ee137d3
           name: memoryEntireStatus
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.16.1.0
@@ -168,11 +144,9 @@ zabbix_export:
           valuemap:
             name: 'xFusion server memoryEntireStatus'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: EntireStatus
-        -
-          uuid: b2c7ecc43fe64e7a826e262e417a076f
+        - uuid: 61d61727918644f9a4e968e08867f83c
           name: OCPCardEntireStatus
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.46.1.0
@@ -181,22 +155,18 @@ zabbix_export:
           valuemap:
             name: 'xFusion server OCPCardStatus'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: EntireStatus
-        -
-          uuid: a903c94c5cb44e7d82b4545f8c70ad5a
+        - uuid: d30df483968b49519497b7c69907b34a
           name: OCPCardMaxNum
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.46.2.0
           key: OCPCardMaxNum
           delay: 600s
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: OCPCard
-        -
-          uuid: b54510c8a75f4e57b2b6546ae2eb3af5
+        - uuid: b7233a07c43d4bd28dbbf825185b7209
           name: PCIeDeviceEntireStatus
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.24.1.0
@@ -206,11 +176,9 @@ zabbix_export:
           valuemap:
             name: 'xFusion server PCIeDeviceStatus'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: EntireStatus
-        -
-          uuid: 115d8ef686344dac85e431470dd9faff
+        - uuid: a6378b4cb1d6430bb6f0f5b2baf945ca
           name: PCIeDeviceMaxNum
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.24.2.0
@@ -218,11 +186,9 @@ zabbix_export:
           delay: 600s
           description: 'Maximum number of PCIe cards..'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: PCIeDevice
-        -
-          uuid: cf057553159e4b88a7e5da122ae3f526
+        - uuid: 3f743c43787449ab9743af65015f2459
           name: peakPower
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.20.1.0
@@ -231,11 +197,9 @@ zabbix_export:
           units: W
           description: 'System peak power, unit is W.'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 63c91762ba86469f818b795e3449473b
+        - uuid: 8c18b3bfc23943c0b298dd68ce72f526
           name: powerConsumption(kWh)
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.20.4.0
@@ -245,11 +209,9 @@ zabbix_export:
           value_type: FLOAT
           description: 'Power consume from power statistic start time, unit is kWh.'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: abbf1e0f6d3843c593ed4dfd717de8d3
+        - uuid: 64e7b9ab04f2430cbee5b806250eba7e
           name: powerSupplyEntireStatus
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.6.1.0
@@ -259,11 +221,9 @@ zabbix_export:
           valuemap:
             name: 'xFusion server powerSupplyEntireStatus'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: EntireStatus
-        -
-          uuid: c17977a42624417285bbcea0fb86f7ec
+        - uuid: 6d5ff7dd0a8a4f5eaff7b1c84ed25e3b
           name: presentSystemPower
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.13.0
@@ -272,11 +232,9 @@ zabbix_export:
           units: W
           description: 'Display the present system power.'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 8253fbaae3e2498eb316452e92d8f539
+        - uuid: 039799641f1c462585329e7d16b27147
           name: sysName
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
@@ -291,11 +249,9 @@ zabbix_export:
              	fully-qualified domain name.
           inventory_link: OS
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 2213e3b6f81b4be59eb2a270ec30cd5f
+        - uuid: 95407cdfdb6a43a6853b8eab6b1eb523
           name: systemCpuUsage
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.23.0
@@ -310,11 +266,9 @@ zabbix_export:
              	-1: invalid current CPU usage.
              	[0,100]: represents the current CPU usage.
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 93c38f7567804642aac916ee62e33c1b
+        - uuid: a09b32d6dd824a7a8fdce514e0d5da4a
           name: systemGuid
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.10.0
@@ -325,11 +279,9 @@ zabbix_export:
           value_type: TEXT
           inventory_link: TAG
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 17cf065fe8ed4378b4e74643c1657437
+        - uuid: 6c8466dbdb8447bb9550dd31f1c278d1
           name: systemHealth
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.1.0
@@ -342,12 +294,10 @@ zabbix_export:
           valuemap:
             name: 'xFusion server systemHealth'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
           triggers:
-            -
-              uuid: bbb38d05b2414536ab194eac59212262
+            - uuid: 4c4a0df4561a400bad0a01db29678b82
               expression: 'last(/xFusion Server iBMC Template/systemHealth)=4'
               name: 'systemHealth Critical'
               priority: DISASTER
@@ -355,8 +305,7 @@ zabbix_export:
                 systemHealth information about system present state of health. 
                  	This value will be one of the following:
                  	(1-OK, 2-Minor, 3-Major, 4-Critical)
-            -
-              uuid: dbe526409a2f4246b027a7a7ca80f2e5
+            - uuid: 65f59b781f204bd0b38b2ac330f99563
               expression: 'last(/xFusion Server iBMC Template/systemHealth)=3'
               name: 'systemHealth major'
               priority: HIGH
@@ -364,14 +313,12 @@ zabbix_export:
                 systemHealth information about system present state of health. 
                  	This value will be one of the following:
                  	(1-OK, 2-Minor, 3-Major, 4-Critical)
-            -
-              uuid: b200ce7d142c4ffbace161f8a0f30e44
+            - uuid: 314b2dbd5b324d80a4f6c1fec2395b88
               expression: 'last(/xFusion Server iBMC Template/systemHealth)=2'
               name: 'systemHealth  minor'
               priority: WARNING
               description: 'systemHealth information about system present state of health.'
-        -
-          uuid: e7fa3bde0dd746e2bc10b845d1513c0e
+        - uuid: e16af9afc26e44d78a732a8b78c21588
           name: systemMemUsage
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.1.25.0
@@ -387,11 +334,9 @@ zabbix_export:
           valuemap:
             name: 'xFusion server invalid Memory usage'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: System
-        -
-          uuid: 50fb918f3b4c4aa2ab7ac8113c7f2799
+        - uuid: bcf6fc87a7cd4e8685e431f98da3c848
           name: 'Inlet Temperature(°C)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.58132.2.235.1.1.26.50.1.3.1
@@ -399,22 +344,18 @@ zabbix_export:
           delay: 600s
           description: 'If power off, the CPU temperature cannot be readable and is set to 65535.'
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '0.1'
-            -
-              type: STR_REPLACE
+            - type: STR_REPLACE
               parameters:
                 - '6553'
                 - '65535'
           tags:
-            -
-              tag: Application
+            - tag: Application
               value: Temperature
       discovery_rules:
-        -
-          uuid: 08d96a032005451fab83291a5863e10d
+        - uuid: b44543dd34284e2a95fafce469f4254f
           name: businessPortBDF
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]'
@@ -423,8 +364,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Business portBDF'
           item_prototypes:
-            -
-              uuid: 533297e85a7549f4a987938989c1f7d9
+            - uuid: 98e4c68f830e4a869af0b8871e622a94
               name: 'businessPort [{#SNMPINDEX}] BDF'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.43.50.1.6.{#SNMPINDEX}'
@@ -434,11 +374,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Business portBDF'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: BusinessPort
-        -
-          uuid: 5450eea150194062a9a412e9a5ec7b22
+        - uuid: 172958d2b9a44b7390d239024cdfd5f2
           name: businessPortLinkStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]'
@@ -446,8 +384,7 @@ zabbix_export:
           delay: 60s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: db273964434c4e19a5fcef7ccd364e0c
+            - uuid: 56692b8f172c493e935cd6c4296850e3
               name: 'BusinessPort[{#SNMPINDEX}] LinkStatus'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.43.50.1.4.{#SNMPINDEX}'
@@ -456,39 +393,32 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               preprocessing:
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - NoLink
                     - Disconnected
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - LinkUp
                     - Connected
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - LinkDown
                     - Disconnected
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: BusinessPort
               trigger_prototypes:
-                -
-                  uuid: 08215e20e5b44a4787f6f57a1ec2ff46
+                - uuid: ce2bb0da6fad440d8088a776b5bb436d
                   expression: 'last(/xFusion Server iBMC Template/BusinessPortLinkStatus[{#SNMPINDEX}])="Disconnected" and change(/xFusion Server iBMC Template/BusinessPortLinkStatus[{#SNMPINDEX}])=1'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/xFusion Server iBMC Template/BusinessPortLinkStatus[{#SNMPINDEX}])="Connected"'
                   name: 'BusinessPort[{#SNMPINDEX}]  Disconnected'
                   priority: WARNING
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: BusinessPort
-        -
-          uuid: 48ccaff040574a698130c09418057e3a
+        - uuid: 5ae5a855c54d41cc914a55c371bc528f
           name: businessPortLocation
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]'
@@ -497,8 +427,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about businessport belongs to which netcard.'
           item_prototypes:
-            -
-              uuid: b345384c3fbd4b009ecb562e9890d5d6
+            - uuid: b41a9811e48547e4898feab8c816166f
               name: 'businessPort [{#SNMPINDEX}] Location'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.43.50.1.3.{#SNMPINDEX}'
@@ -508,11 +437,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about businessport belongs to which netcard.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: BusinessPort
-        -
-          uuid: 00ff9e0c41a54ef7bc7828554244c881
+        - uuid: d655f9dfd600433b9f9875f5369380c7
           name: businessPortMacAddr
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]'
@@ -521,8 +448,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Business port MAC address.'
           item_prototypes:
-            -
-              uuid: 7ef43eb786cd44c6b831c6808b0b984b
+            - uuid: 457d18d3fb4a44ccafa69d5ccb19605a
               name: 'BusinessPort[{#SNMPINDEX}] MacAddr'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.43.50.1.5.{#SNMPINDEX}'
@@ -532,11 +458,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Business port MAC address.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: BusinessPort
-        -
-          uuid: 6569e76f46dc40c995b06ee8a542d727
+        - uuid: 456572d25a0943e59500313be0c795d4
           name: businessPortOSLinkStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]'
@@ -547,8 +471,7 @@ zabbix_export:
             Business port link status reported by OS. The status will be
             N/A if iBMA is not installed.
           item_prototypes:
-            -
-              uuid: 5d5214e50cd3471db6a7c241f1339185
+            - uuid: 8e9ecbcb67774d3ca061878adccbad01
               name: 'businessPort [{#SNMPINDEX}] OSLinkStatus'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.43.50.1.7.{#SNMPINDEX}'
@@ -558,28 +481,23 @@ zabbix_export:
               value_type: TEXT
               description: 'Business port link status reported by OS. The status will be N/A if iBMA is not installed.'
               preprocessing:
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - NoLink
                     - Disconnected
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - LinkUp
                     - Connected
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - LinkDown
                     - Disconnected
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: BusinessPort
               trigger_prototypes:
-                -
-                  uuid: 75c55635c6c04105b3376c2b9160c5b4
+                - uuid: ab7f86018ec84f0eaa23441ff8e4983c
                   expression: 'last(/xFusion Server iBMC Template/businessPortOSLinkStatus[{#SNMPINDEX}])="Disconnected" and change(/xFusion Server iBMC Template/businessPortOSLinkStatus[{#SNMPINDEX}])=1'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/xFusion Server iBMC Template/businessPortOSLinkStatus[{#SNMPINDEX}])="Connected"'
@@ -587,11 +505,9 @@ zabbix_export:
                   event_name: 'BusinessPortOSLinkStatust[{#SNMPINDEX}]'
                   priority: WARNING
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: BusinessPort
-        -
-          uuid: 5fcc4cc41cd14cfc825e55bf823bcbff
+        - uuid: 36598acfb3eb48d1873682e56538f9a2
           name: businessPortSilkNum
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.43.50.1.1]'
@@ -600,8 +516,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about business port silk number within a netcard.'
           item_prototypes:
-            -
-              uuid: c328085c3d4f49ada2fe5063d90eb63a
+            - uuid: 8e0a45cfad19430c910ea25201aa1a7d
               name: 'businessPort {#SNMPVALUE} SilkNum'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.43.50.1.2.{#SNMPINDEX}'
@@ -609,11 +524,9 @@ zabbix_export:
               delay: 86400s
               description: 'Information about business port silk number within a netcard.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: BusinessPort
-        -
-          uuid: 08bf5b90f1bb40d986d4fd058347564b
+        - uuid: cab05da5a4c84843b04a4a2c38d0a914
           name: cpuClockRate
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]'
@@ -622,8 +535,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about CPU clock rate'
           item_prototypes:
-            -
-              uuid: cfa0c32541144e6e97ff69c4c9b5e10d
+            - uuid: 6f9c855066e24690a60b97e61f3dc4dc
               name: 'cpu {#SNMPVALUE} ClockRate'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.15.50.1.5.{#SNMPINDEX}'
@@ -632,11 +544,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: CPU
-        -
-          uuid: 669e37ea2ca34c3fa7b66417d5a85071
+        - uuid: e74d61c63ca3474dbc2a93f98eb8210c
           name: cpuFamily
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]'
@@ -645,8 +555,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about CPU family'
           item_prototypes:
-            -
-              uuid: 64a5d37642a54a0291efc07cf56c8a06
+            - uuid: 2523153bf0654a89bff5abb7963aa0d0
               name: 'cpu {#SNMPVALUE} Family'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.15.50.1.3.{#SNMPINDEX}'
@@ -655,11 +564,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: CPU
-        -
-          uuid: 86e12040f4ed4b15a1fc646dacd6a6d3
+        - uuid: f103eed5eb6a4cf8af11b857448075f5
           name: cpuManufacturer
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]'
@@ -668,8 +575,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about CPU manufacturer'
           item_prototypes:
-            -
-              uuid: 9fb205d35070445cb3bf4fb7f2ef0d10
+            - uuid: 13a383044f074846be387b728b6a000c
               name: 'cpu {#SNMPVALUE} Manufacturer'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.15.50.1.2.{#SNMPINDEX}'
@@ -678,11 +584,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: CPU
-        -
-          uuid: 30d062e22e204514925546e5743eb6d6
+        - uuid: 72e64f1b45fa49f6980a829031c3c238
           name: cpuStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]'
@@ -691,8 +595,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about CPU health status.'
           item_prototypes:
-            -
-              uuid: 20993969f8bf4ae38c767a2087d6b7ef
+            - uuid: acd6389abe934ac2aae6c5cf360965db
               name: 'cpu {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.15.50.1.6.{#SNMPINDEX}'
@@ -704,36 +607,31 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server cpuEntireStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: CPU
               trigger_prototypes:
-                -
-                  uuid: 7562b336580d4920aaad5801a527e454
+                - uuid: d57282574f534b0b9a9b8fd56ed08193
                   expression: 'last(/xFusion Server iBMC Template/cpuStatus[{#SNMPVALUE}])=4'
                   name: 'cpu [{#SNMPVALUE}] status critical'
                   priority: DISASTER
                   tags:
                     - tag: Application
                       value: CPU
-                -
-                  uuid: 220df50c1e11433891fe62fa2a3d5b9b
+                - uuid: 412cbac1e40141ef82b86a45da91cff7
                   expression: 'last(/xFusion Server iBMC Template/cpuStatus[{#SNMPVALUE}])=3'
                   name: 'cpu [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
                     - tag: Application
                       value: CPU
-                -
-                  uuid: 2352962d6fba48d794b3728c6554f1ae
+                - uuid: 92438df671014e7d9fd6acce0e104975
                   expression: 'last(/xFusion Server iBMC Template/cpuStatus[{#SNMPVALUE}])=2'
                   name: 'cpu [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
                     - tag: Application
                       value: CPU
-        -
-          uuid: bbeb2d335cdf4dfc9f589c1498c67e25
+        - uuid: a32438a5960c4509a4eb2f305a118b5c
           name: cpuType
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.15.50.1.1]'
@@ -742,8 +640,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about CPU type'
           item_prototypes:
-            -
-              uuid: 02ea6754eafe4d66a195c0755f225576
+            - uuid: beb0da4588ee4c4d8ef1a5649879fa16
               name: 'cpu {#SNMPVALUE} Type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.15.50.1.4.{#SNMPINDEX}'
@@ -752,11 +649,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: CPU
-        -
-          uuid: 1f16bf16509541c385bc4ddc6b23aafd
+        - uuid: fc51981c2b6d4deebce1401a5a06ea66
           name: fanSpeed
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.8.50.1.1]'
@@ -764,8 +659,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 301f29945e444777bbb9f19e6977e45c
+            - uuid: caa85dccea9b491d97a2dc2891fa0ad4
               name: 'fan {#SNMPVALUE} Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.8.50.1.2.{#SNMPINDEX}'
@@ -773,11 +667,9 @@ zabbix_export:
               delay: 600s
               units: rpm
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Fan
-        -
-          uuid: 326bed8edff2479fbdf7c667edd57ea9
+        - uuid: e1f41c69597f4fc68678aeb98716b1ed
           name: fanStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.8.50.1.1]'
@@ -785,8 +677,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 9d1c1754922546e69c6f47961cf7880f
+            - uuid: 9fddd8646a404fa8936660289fdb95cb
               name: 'fan {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.8.50.1.4.{#SNMPINDEX}'
@@ -797,36 +688,31 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server fanEntireStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Fan
               trigger_prototypes:
-                -
-                  uuid: 4ddcf05225f649889365b56aaad07023
+                - uuid: e2073f404c274ba69cd1dc489201fdf2
                   expression: 'last(/xFusion Server iBMC Template/fanStatus[{#SNMPVALUE}])=4'
                   name: 'fan  [{#SNMPVALUE}] status critical'
                   priority: DISASTER
                   tags:
                     - tag: Application
                       value: Fan
-                -
-                  uuid: 360c1333e92f4913be1d58a6cdded5e7
+                - uuid: 2f6fd766c6494674ac27fef43c1dc02b
                   expression: 'last(/xFusion Server iBMC Template/fanStatus[{#SNMPVALUE}])=3'
                   name: 'fan [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
                     - tag: Application
                       value: Fan
-                -
-                  uuid: f8bcae22328e4ea3bf63bfdeb896229a
+                - uuid: 3f838d59679b4b1a88d30bfd7ad03516
                   expression: 'last(/xFusion Server iBMC Template/fanStatus[{#SNMPVALUE}])=2'
                   name: 'fan  [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
                     - tag: Application
                       value: Fan
-        -
-          uuid: 24e438adead641c583bc0e7995ebbeae
+        - uuid: b723e2240c74476ba16530ea6a7bb760
           name: firmwareLocation
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.11.50.1.1]'
@@ -835,8 +721,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about firmware location'
           item_prototypes:
-            -
-              uuid: 70e3d931979f44579562bb17f0ac0aeb
+            - uuid: 047487a57123416cbd97656623189980
               name: 'firmware {#SNMPVALUE} Location'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.11.50.1.5.{#SNMPINDEX}'
@@ -845,11 +730,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Firmware
-        -
-          uuid: b4f25f001a3649feb96bb273ebcdd183
+        - uuid: 70baffc5100a4a4c98715bea8d5b87c2
           name: firmwareReleaseDate
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.11.50.1.1]'
@@ -858,8 +741,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about firmware release date.'
           item_prototypes:
-            -
-              uuid: 065450f0545a40b59912ebe6cd7251dd
+            - uuid: c3a81d228dd74f95955867e294e31f60
               name: 'firmware {#SNMPVALUE} ReleaseDate'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.11.50.1.3.{#SNMPINDEX}'
@@ -868,11 +750,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Firmware
-        -
-          uuid: a94ce76b4e2d468c9804b7b6af04d90e
+        - uuid: 2d1b2f83d5ba44c7af19db5f8fa79fcd
           name: firmwareVersion
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.11.50.1.1]'
@@ -880,8 +760,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: a35a7c6f05a84182ac7ecaad6ae5e3f9
+            - uuid: 2f6892538b0b4e15938fc37d01747ef2
               name: 'firmware {#SNMPVALUE} Version'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.11.50.1.4.{#SNMPINDEX}'
@@ -891,11 +770,9 @@ zabbix_export:
               value_type: TEXT
               description: 'firmware Version'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Firmware
-        -
-          uuid: 977885af009643d3b91b53ae344104ae
+        - uuid: 4318f84e4dc24df78d72fb2fe5630514
           name: hardDiskCapacityInGB(GB)
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]'
@@ -903,8 +780,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 1f13faeb8bf048569823a82817ff50e1
+            - uuid: ddc7c8873c2b443cae28d04707217d7d
               name: 'hardDisk {#SNMPVALUE} CapacityInGB(GB)'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.18.50.1.12.{#SNMPINDEX}'
@@ -916,21 +792,17 @@ zabbix_export:
                 Hard disk capacity (GB)
                 1:unknown(-1)
               preprocessing:
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - 'return value+"GB"'
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - '-1GB'
                     - unkown
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: HardDisk
-        -
-          uuid: 5eb414943c154d4485796adfd97ae5c6
+        - uuid: 3e31f1b2bd0144b2acf8da8810f4228c
           name: hardDiskManufacturer
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]'
@@ -938,8 +810,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: e95446b772a44a97ba8d222d6662e32e
+            - uuid: 8ab66191f3b148af81d5d12c34e19f1a
               name: 'hardDisk {#SNMPVALUE} Manufacturer'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.18.50.1.9.{#SNMPINDEX}'
@@ -948,11 +819,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: HardDisk
-        -
-          uuid: 01908119498e454aa029e2be3bfaf150
+        - uuid: 81982ba1798444e087340b813505c0bd
           name: hardDiskModelNumber
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]'
@@ -961,8 +830,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Harddisk model number.'
           item_prototypes:
-            -
-              uuid: c2345f6dda384f3c8d2ee54ab47b0991
+            - uuid: 3ba02024f7684255851510229091ad47
               name: 'hardDisk {#SNMPVALUE} ModelNumber'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.18.50.1.8.{#SNMPINDEX}'
@@ -972,11 +840,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Harddisk model number.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: HardDisk
-        -
-          uuid: 6bc25fa9c33a4a07aaf086a9b7ee4a1b
+        - uuid: 20c2c79bcb504e159d73800f7ca9439f
           name: hardDiskSerialNumber
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]'
@@ -984,8 +850,7 @@ zabbix_export:
           delay: 3600s
           description: 'Harddisk serial number.'
           item_prototypes:
-            -
-              uuid: 18b305a88aba49bcbd66304c7aa38a51
+            - uuid: cbba2f82b65645c0957416d50313ae39
               name: 'hardDisk {#SNMPVALUE} Serial Number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.18.50.1.7.{#SNMPINDEX}'
@@ -995,11 +860,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Harddisk serial number.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: HardDisk
-        -
-          uuid: 0828621717a747508195e03df665351e
+        - uuid: dd3122157fdf4f99b074dcf85af14534
           name: hardDiskStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.18.50.1.1]'
@@ -1007,8 +870,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 16a69f34194442deb917a3cfc95b291e
+            - uuid: 31b334f09c56480f86fae593b1896d65
               name: 'hardDisk {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.18.50.1.3.{#SNMPINDEX}'
@@ -1019,36 +881,31 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server hardDiskEntireStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: HardDisk
               trigger_prototypes:
-                -
-                  uuid: d4419c1dd26c4df5903eeba1cae40ea0
+                - uuid: a5e09e5c6ef84d22ab632b24b52c38ad
                   expression: 'last(/xFusion Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=4'
                   name: 'hardDisk [{#SNMPVALUE}] status critical'
                   priority: DISASTER
                   tags:
                     - tag: Application
                       value: HardDisk
-                -
-                  uuid: 59915792fec64f27a73973e521166712
+                - uuid: b6ee524f95574e96a6f8e208770240e1
                   expression: 'last(/xFusion Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=3'
                   name: 'hardDisk [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
                     - tag: Application
                       value: HardDisk
-                -
-                  uuid: 53ef6e34f73a416b9d1876b63cd78861
+                - uuid: 9b705f38cb3d4f5db63bee06750cb9d0
                   expression: 'last(/xFusion Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=2'
                   name: 'hardDisk [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
                     - tag: Application
                       value: HardDisk
-        -
-          uuid: 0a78824a625a47d78d1d71f0b6336aca
+        - uuid: 79ab3aa7eaa74102a065a27ed6311a8d
           name: logicalDriveName
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.37.50.1.1]'
@@ -1057,8 +914,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about logical drive name.[X.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2'
           item_prototypes:
-            -
-              uuid: 2fb9800105344c6ba2d019a55a680a2d
+            - uuid: 45ef6967e6114e1c91ba0e01973f9d07
               name: 'logicalDrive {#SNMPINDEX} Name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.37.50.1.19.{#SNMPINDEX}'
@@ -1068,11 +924,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about logical drive name,[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: LogicalDrive
-        -
-          uuid: f4d27de402be4df885b7ec24b17dedd3
+        - uuid: b54f9d6c4dc4425ca6cb09308846ae75
           name: logicalDriveRaidLevel
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.37.50.1.1]'
@@ -1080,8 +934,7 @@ zabbix_export:
           delay: 3600s
           description: 'Information about logical drive RAID level.[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2'
           item_prototypes:
-            -
-              uuid: b78aa23fc3b745de878aa6321e9d2fe1
+            - uuid: d2e00a7cc243474f8532c4cc870125d4
               name: 'logicalDrive {#SNMPINDEX} RAIDLevel'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.37.50.1.3.{#SNMPINDEX}'
@@ -1091,11 +944,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about logical drive RAID level.[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: LogicalDrive
-        -
-          uuid: add8a96996c74d6abe8a371cb1a94809
+        - uuid: 5bf1187e17c1467fae41163a24f63627
           name: logicalDriveSize(MB)
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.37.50.1.1]'
@@ -1103,8 +954,7 @@ zabbix_export:
           delay: 3600s
           description: 'Information about logical drive size,[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2'
           item_prototypes:
-            -
-              uuid: 9e1cac0577b94184993a8e07bd2f9c61
+            - uuid: 4c35659203bc47ebb7a9642cd115e978
               name: 'logicalDrive {#SNMPINDEX} Size(MB)'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.37.50.1.15.{#SNMPINDEX}'
@@ -1114,21 +964,17 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about logical drive size (MB).[x.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2'
               preprocessing:
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - 'return value+"MB"'
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - '-1MB'
                     - unkown
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: LogicalDrive
-        -
-          uuid: fb33d58ad8f84fd19dbcc7cb8fb38ba4
+        - uuid: 39b6249c7bde41d8ac4b93003aa041d9
           name: logicalDriveState
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.37.50.1.1]'
@@ -1136,8 +982,7 @@ zabbix_export:
           delay: 3600s
           description: 'Information about logical drive state,[X.y]X represents the number of the raid card, y represents the number of the logical drive, such as 0, 1, 2'
           item_prototypes:
-            -
-              uuid: 56a31b8a50c746f7b5a18ee53052230b
+            - uuid: 01e0f477057344a28aac3843c1004e57
               name: 'logicalDrive {#SNMPINDEX} State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.37.50.1.4.{#SNMPINDEX}'
@@ -1147,30 +992,24 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server logicalDriveState'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: LogicalDrive
               trigger_prototypes:
-                -
-                  uuid: 97e27ea621044e479fcd93d69d921021
+                - uuid: d85a74e3890d4ff7b3b9af4b010fac7c
                   expression: 'in(last(/xFusion Server iBMC Template/logicalDriveState[{#SNMPINDEX}]),1,5,15,25,28)=4'
                   name: 'logicalDrive[{#SNMPVALUE}] state critical'
                   priority: DISASTER
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: LogicalDrive
-                -
-                  uuid: 715439f8397d4282a4517946d598e2ed
+                - uuid: 93cedfa53aca4238837c1521615616c8
                   expression: 'in(last(/xFusion Server iBMC Template/logicalDriveState[{#SNMPINDEX}]),2,3,6,7,8,9,10,11,12,13,14,16,17,20,21)=2'
                   name: 'logicalDrive[{#SNMPVALUE}] state minor'
                   priority: WARNING
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: LogicalDrive
-        -
-          uuid: cb701d9a90f8411ca391752f0925489b
+        - uuid: dccd7d760e5444aa960c4d1aa2c6201d
           name: memoryClockRate
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.16.50.1.1]'
@@ -1179,8 +1018,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about memory clock rate.The units MHz.'
           item_prototypes:
-            -
-              uuid: b18c53f2e93c48d19bae8f47900f0407
+            - uuid: e553d10a8d4f409f9754f3cad7dde4a5
               name: 'memory {#SNMPVALUE} ClockRate'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.16.50.1.5.{#SNMPINDEX}'
@@ -1190,11 +1028,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about memory clock rate.The units MHz.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Memory
-        -
-          uuid: 411020286a8c4420bb5817a32ef3a5aa
+        - uuid: 01b28d9d2c254144a343835e3cd06bc0
           name: memoryManufacturer
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.16.50.1.1]'
@@ -1202,8 +1038,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 83375d4bff1b474f80bac165a0fd88aa
+            - uuid: 5cb52004b93b4546ab579b96575879df
               name: 'memory {#SNMPVALUE} Manufacturer'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.16.50.1.3.{#SNMPINDEX}'
@@ -1213,11 +1048,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about memory manufacturer.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Memory
-        -
-          uuid: 4f4a66201f704f71bf3c3872ce3f7802
+        - uuid: 4128870eb52f488a8c2e222a6a85a0c6
           name: memorySize
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.16.50.1.1]'
@@ -1225,8 +1058,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: b70158a4cbf24d85b5a3ee80828c884d
+            - uuid: 1a0e4e2c595f4a559caf12c697b620cd
               name: 'memory {#SNMPVALUE} Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.16.50.1.4.{#SNMPINDEX}'
@@ -1236,11 +1068,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about memory capacity.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Memory
-        -
-          uuid: a4c6962179b44880b54c95c769fdad2d
+        - uuid: 58047b9fc608416ba88dd0e4990093e3
           name: memoryStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.16.50.1.1]'
@@ -1248,48 +1078,40 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: b3258882a13244cebad7aa9d646be99c
+            - uuid: 73c98e6d979d4fbcbb04b36a857adbac
               name: 'memory {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.16.50.1.6.{#SNMPINDEX}'
               key: 'memoryStatus[{#SNMPVALUE}]'
               delay: 600s
-              history: 7d
-              trends: 90d
               valuemap:
                 name: 'xFusion server memoryEntireStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Memory
               trigger_prototypes:
-                -
-                  uuid: 11356bc270924bb48e1318e7cf0656ee
+                - uuid: 96e1c02fc72447648ebaa9cddec70426
                   expression: 'last(/xFusion Server iBMC Template/memoryStatus[{#SNMPVALUE}])=4'
                   name: 'memory [{#SNMPVALUE}] status critical'
                   priority: DISASTER
                   tags:
                     - tag: Application
                       value: Memory
-                -
-                  uuid: fc00224018f3412cb3eb677f97384333
+                - uuid: 302646db6154410bbd1ac7eca6b559fb
                   expression: 'last(/xFusion Server iBMC Template/memoryStatus[{#SNMPVALUE}])=3'
                   name: 'memory [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
                     - tag: Application
                       value: Memory
-                -
-                  uuid: 642d325a7fc7481fb17f1a1f94d29de0
+                - uuid: 0025ee56f4664cf4b951edebc3f626e5
                   expression: 'last(/xFusion Server iBMC Template/memoryStatus[{#SNMPVALUE}])=2'
                   name: 'memory [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
                     - tag: Application
                       value: Memory
-        -
-          uuid: 29ed0a0b52b44141a2eea46894d4e350
+        - uuid: cd1be2d7bb8043e39c59f9805daa5bf1
           name: netCardLocation
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.25.50.1.1]'
@@ -1298,8 +1120,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Netcard physical Location.'
           item_prototypes:
-            -
-              uuid: 171c1764f7b745abadbfcab5e738de7d
+            - uuid: 2b9107583594446a91aa257e2275a454
               name: 'netCard {#SNMPVALUE} Location'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.25.50.1.2.{#SNMPINDEX}'
@@ -1309,11 +1130,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Netcard physical Location.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: NetCard
-        -
-          uuid: a3853b39410b4a4d8c4d9377a1ee2bd7
+        - uuid: 156161dc3cec42269b614519b9f3f640
           name: netCardNICName
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.25.50.1.1]'
@@ -1321,8 +1140,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 4303d713ff344dd2b2e1272aff11f40c
+            - uuid: 6da8265230ff44c68a70c442172f15e4
               name: 'netCardNIC {#SNMPVALUE} Name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.25.50.1.7.{#SNMPINDEX}'
@@ -1331,11 +1149,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: NetCard
-        -
-          uuid: 09fa65e66fb84f8ba7c84d40a5ee7696
+        - uuid: 347c82eba2524e7b9e7593ee428bec38
           name: netCardStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.25.50.1.1]'
@@ -1343,8 +1159,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: db1294da6036460fa47277cbdd823d3b
+            - uuid: 79644b7938184a1d85a95d217adf4be6
               name: 'netCard {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.25.50.1.18.{#SNMPINDEX}'
@@ -1354,39 +1169,31 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server netCardStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: NetCard
               trigger_prototypes:
-                -
-                  uuid: 6cb5fbfe43f34ea1b461a324fc2f5243
+                - uuid: 184152a3e94645528c55b6c01995916a
                   expression: 'last(/xFusion Server iBMC Template/netCardStatus[{#SNMPVALUE}])=4'
                   name: 'netCard [{#SNMPVALUE}] status critical'
                   priority: DISASTER
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: NetCard
-                -
-                  uuid: 4817169b60e241cc82e2e65ebeb2314b
+                - uuid: 0904932d106f4828a4cba70f1a0e8b7d
                   expression: 'last(/xFusion Server iBMC Template/netCardStatus[{#SNMPVALUE}])=3'
                   name: 'netCard [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: NetCard
-                -
-                  uuid: 6bf22cfac5cc47ecbae4e513be893d98
+                - uuid: ada416f907a84a9898315ce3a03fcdd9
                   expression: 'last(/xFusion Server iBMC Template/netCardStatus[{#SNMPVALUE}])=2'
                   name: 'netCard [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: NetCard
-        -
-          uuid: 6b190986f09a4fee9f1e15a5bf6be444
+        - uuid: b54bf2f15d6e4156b0a6937c9ef2fad7
           name: OCPCardAvailability
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1394,8 +1201,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 87136a9877764fea9ac8e36327b03a75
+            - uuid: 643edbf0e67c422c96302f8ba201de83
               name: 'OCPCard {#SNMPVALUE} Availability'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.4.{#SNMPINDEX}'
@@ -1404,11 +1210,9 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server OCPCardAvailability'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: 7f1372e5be8b458482eba55e86e96e09
+        - uuid: bf70ccfc722642a087c4c9b3caccb61f
           name: OCPCardDescription
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1416,8 +1220,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 0beb3e89eb3243eca025c0e190e65a16
+            - uuid: eb30258cd21b49f99822dde5c592fb1f
               name: 'OCPCard {#SNMPVALUE} Description'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.11.{#SNMPINDEX}'
@@ -1426,11 +1229,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: d2eef98ab0614b9396184a213323f4da
+        - uuid: 2bb3286c492e421b8b49aa955d9e8e06
           name: OCPCardDID
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1438,19 +1239,16 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 386d5a722c57422980d47e0724ff1425
+            - uuid: ea8029bbe3f74988becf09fcaab95c06
               name: 'OCPCard {#SNMPVALUE} DID'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.9.{#SNMPINDEX}'
               key: 'OCPCardDID[{#SNMPVALUE}]'
               delay: 86400s
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: c49fe950f415427d907f45a783dda724
+        - uuid: 1afe55950b234ae78d32687086d8855c
           name: OCPCardFunction
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1458,8 +1256,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 55b147ce7c674edf91933e6bc28a6277
+            - uuid: d4b04d5a713a4f76bd5434b13b1c518c
               name: 'OCPCard {#SNMPVALUE} Function'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.6.{#SNMPINDEX}'
@@ -1468,11 +1265,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: f098ac8834624156aed5ef985e6b1092
+        - uuid: 303b17157d7242fdb4147059dc0b9769
           name: OCPCardLocation
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1480,8 +1275,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 2f4d44625b74422f884318bd47bc7632
+            - uuid: 796734cc38f444bda9bf333da0b67841
               name: 'OCPCard {#SNMPVALUE} Location'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.5.{#SNMPINDEX}'
@@ -1490,11 +1284,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: 19ada1c791284a39964bd91858b6b604
+        - uuid: 9c610e40675d49dab724285a469f2ff5
           name: OCPCardManufacturer
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1502,8 +1294,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 577cb24d1dfa4063af72aa4e4e04fd49
+            - uuid: dbb4a3d6dcd8494a9beeb2a2d247c8b1
               name: 'OCPCard {#SNMPVALUE} Manufacturer'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.10.{#SNMPINDEX}'
@@ -1512,11 +1303,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: df64929e64134931a771da415a19bea6
+        - uuid: b22fd6c0787842f2b81ac308b7bd2e4a
           name: OCPCardName
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1524,8 +1313,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: b87339e3e22149718c6073eebe7859ec
+            - uuid: e215111715ea4855a0904d9acff16d97
               name: 'OCPCard {#SNMPVALUE} Name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.7.{#SNMPINDEX}'
@@ -1534,11 +1322,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: 0c6d1ea1b8a74ee19369c3ba3702c170
+        - uuid: 0ed48a3e1a80463598d360834d434df8
           name: OCPCardPresence
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1546,8 +1332,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 950851bcb76441a9a34cd49f6f20324a
+            - uuid: 43e784db29724b9ca591ed29a5f5bdf7
               name: 'OCPCard {#SNMPVALUE} Presence'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.2.{#SNMPINDEX}'
@@ -1556,11 +1341,9 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server OCPCardPresence'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: b545050f773d421cbca2fb978f996801
+        - uuid: d5b6ed578ca94bfa85817baab50a8d4e
           name: OCPCardStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1568,8 +1351,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: d92f39a3daa641219d5cfaa88c5e6e67
+            - uuid: 64634fbf231c43489dbc5b0b3222b09f
               name: 'OCPCard {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.3.{#SNMPINDEX}'
@@ -1579,39 +1361,31 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server OCPCardStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
               trigger_prototypes:
-                -
-                  uuid: abdf036ba33c407eb789e00a695e41d8
+                - uuid: 5a762b6436354ba1b23018ee6dc0f8d9
                   expression: 'last(/xFusion Server iBMC Template/OCPCardStatus[{#SNMPVALUE}])=4'
                   name: 'OCPCard [{#SNMPVALUE}] status critical'
                   priority: DISASTER
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: OCPCard
-                -
-                  uuid: 9474e047199943d0a3ac3d742460fd01
+                - uuid: e7a26d2a67a844f780e77e0d3f5c938b
                   expression: 'last(/xFusion Server iBMC Template/OCPCardStatus[{#SNMPVALUE}])=3'
                   name: 'OCPCard [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: OCPCard
-                -
-                  uuid: 01507c36caeb415eab5ea17e35aec32c
+                - uuid: bd5fc42f10ad427180a7f4a0bace0995
                   expression: 'last(/xFusion Server iBMC Template/OCPCardStatus[{#SNMPVALUE}])=2'
                   name: 'OCPCard [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: OCPCard
-        -
-          uuid: 265a7079fd164daaad7d1999eb6ee55a
+        - uuid: ca7c71c0b069401899525f085ca567b4
           name: OCPCardVID
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.46.50.1.1]'
@@ -1619,19 +1393,16 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: e24c69ecb47845079c24ffa6552cc7a3
+            - uuid: b9804f92ed7d4a2293a2c126891b2149
               name: 'OCPCard {#SNMPVALUE} VID'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.46.50.1.8.{#SNMPINDEX}'
               key: 'OCPCardVID[{#SNMPVALUE}]'
               delay: 86400s
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: OCPCard
-        -
-          uuid: dfe6d3337689413287e5c60ae6123bbe
+        - uuid: 582bdfbbec104c84aafd8a4fefdeb73d
           name: PCIeDeviceAvailability
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1639,8 +1410,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: ce6a61940bee4cb1831ffd2c9b96748a
+            - uuid: 616720e37d344a849caa194e63464e54
               name: 'PCIeDevice {#SNMPVALUE} Availability'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.4.{#SNMPINDEX}'
@@ -1649,11 +1419,9 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server PCIeAvailability'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: 14029905f1594e46a3bdaec9cc4c1d7a
+        - uuid: a0b01b581de642cb8ea9bd2deace9dfe
           name: PCIeDeviceDescription
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1661,8 +1429,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: bcfe471f1e014f188a88263df27b6c1d
+            - uuid: fa22f48ef9aa45939a39243bea7a79a5
               name: 'PCIeDevice {#SNMPVALUE} Description'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.11.{#SNMPINDEX}'
@@ -1671,11 +1438,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: 74fa731e7a0c4d0fbf86820eb4bc3864
+        - uuid: f1279d79b7334e3a858a034a7cdef436
           name: PCIeDeviceDevicename
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1683,8 +1448,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: cc1e49599f054cf4b42d3b1ee4a5be05
+            - uuid: b34839533e3749cca5a105c4f6c3dd66
               name: 'PCIeDevice {#SNMPVALUE} Devicename'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.7.{#SNMPINDEX}'
@@ -1693,11 +1457,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: f0a24ab2b4dd4c71a202d085f63a2789
+        - uuid: 2dcbd0baff1d4cc78f973139f52cd4c8
           name: PCIeDeviceDID
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1705,19 +1467,16 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: a3ba3dc452bb4a2c8948199abf6aa844
+            - uuid: ced44732125f447f820de9b868c99cae
               name: 'PCIeDevice {#SNMPVALUE} DID'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.9.{#SNMPINDEX}'
               key: 'PCIeDeviceDID[{#SNMPVALUE}]'
               delay: 86400s
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: 48bdae25f3db4e2a9269632a41c3430d
+        - uuid: 236419623a3048cf88cb55ebff505429
           name: PCIeDeviceFunction
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1725,8 +1484,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 61117efaa08743be96829be18826d917
+            - uuid: 3f27a31ffe18466b859747dddbbe719d
               name: 'PCIeDevice {#SNMPVALUE} Function'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.6.{#SNMPINDEX}'
@@ -1735,11 +1493,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: f2c38f9cdc1e40b997dbae56d9f23182
+        - uuid: 8271dd2ddeb7488bb651f31712a2947d
           name: PCIeDeviceLocation
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1747,8 +1503,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 1554b07cac8b45609f45753d46c63dcf
+            - uuid: 67efc5c72a8a4cc29f7dfdc18ddfac95
               name: 'PCIeDevice {#SNMPVALUE} Location'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.5.{#SNMPINDEX}'
@@ -1757,11 +1512,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: 027791c9aea64d828cfa19bab9401026
+        - uuid: 5c4397ee9a8340aabd979c8e9df8c5df
           name: PCIeDeviceManufacturer
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1769,8 +1522,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 35c2e2f345f543c290e50be2fa60694f
+            - uuid: d21395ac8e364e1c819c0d656db69598
               name: 'PCIeDevice {#SNMPVALUE} Manufacturer'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.10.{#SNMPINDEX}'
@@ -1779,11 +1531,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: fa2bb087c4664afc961381eaf2ec272f
+        - uuid: 6530af41d20c46e5a69aed5f70a078ed
           name: PCIeDevicePresence
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1791,8 +1541,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: da1117baab394407a03c6b6506f292c9
+            - uuid: ea211a58869444819d668287e529c5b8
               name: 'PCIeDevice {#SNMPVALUE} Presence'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.2.{#SNMPINDEX}'
@@ -1802,11 +1551,9 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server PCIeDevicePresence'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: 9e066df915d84d748db5ce809367f174
+        - uuid: 2eddfe3524c945a8a662d0f8ff8e898a
           name: PCIeDeviceStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1814,8 +1561,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: b22262483e8d4d588e9115eb5cea0f03
+            - uuid: 798a5a6e27994966a058cb49d6373945
               name: 'PCIeDevice {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.3.{#SNMPINDEX}'
@@ -1825,39 +1571,31 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server PCIeDeviceStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
               trigger_prototypes:
-                -
-                  uuid: 941b5f76c15d4c70a3c6faf6146f1f30
+                - uuid: 7ec344f35cc54aa180e1ce98db6dbdcf
                   expression: 'last(/xFusion Server iBMC Template/PCIeDeviceStatus[{#SNMPVALUE}])=4'
                   name: 'PCIeDevice [{#SNMPVALUE}] status critical'
                   priority: DISASTER
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: PCIeDevice
-                -
-                  uuid: 0add281bbfdd4b93b7baea8201503a0d
+                - uuid: 5f3eec4117fe4359989e936a8e415b68
                   expression: 'last(/xFusion Server iBMC Template/PCIeDeviceStatus[{#SNMPVALUE}])=3'
                   name: 'PCIeDevice [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: PCIeDevice
-                -
-                  uuid: e46beb88e5a840119070e92061b0ee60
+                - uuid: 5765af6ab729490686811ad7b6eafaab
                   expression: 'last(/xFusion Server iBMC Template/PCIeDeviceStatus[{#SNMPVALUE}])=2'
                   name: 'PCIeDevice [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
-                    -
-                      tag: Application
+                    - tag: Application
                       value: PCIeDevice
-        -
-          uuid: b27e44b588184f85baa3b5adb4bef159
+        - uuid: c0f2defe76c9442c936771124772f65b
           name: PCIeDeviceVID
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.24.50.1.1]'
@@ -1865,19 +1603,16 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 3c68b1ebf85343dca7e886fc7b113592
+            - uuid: 457bc24ab14240d88a6765f1f6059948
               name: 'PCIeDevice {#SNMPVALUE} VID'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.24.50.1.8.{#SNMPINDEX}'
               key: 'PCIeDeviceVID[{#SNMPVALUE}]'
               delay: 86400s
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PCIeDevice
-        -
-          uuid: e3c45cb1a104453e8e7fe4454a968d8d
+        - uuid: 4c999198ef0a4cdf9521f9675e2dcf2e
           name: powerSupplyInputPower
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.6.50.1.1]'
@@ -1885,8 +1620,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 555a49a7951a49e084d6351ee5386775
+            - uuid: 4878e2ad023f426ebf5a3db122d5c991
               name: 'powerSupply {#SNMPVALUE} InputPower'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.6.50.1.8.{#SNMPINDEX}'
@@ -1894,11 +1628,9 @@ zabbix_export:
               delay: 86400s
               units: W
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PowerSupply
-        -
-          uuid: 0d58ec61bec3494e9a35c3c152590889
+        - uuid: d726b263ec89464f8745a369cb443e19
           name: powerSupplyStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.6.50.1.1]'
@@ -1906,8 +1638,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 645ebd68eb63487d9afaee7869a53c16
+            - uuid: 8cb7d89e6e2940548ad7eee60306e3d8
               name: 'powerSupply {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.6.50.1.7.{#SNMPINDEX}'
@@ -1919,36 +1650,31 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server powerSupplyEntireStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: PowerSupply
               trigger_prototypes:
-                -
-                  uuid: 4ecfce4dca5a46eabb570578d95ecd40
+                - uuid: 474619cf681a4f7c839f12093fa0a55a
                   expression: 'last(/xFusion Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=4'
                   name: 'powerSupply [{#SNMPVALUE}] status critical'
                   priority: DISASTER
                   tags:
                     - tag: Application
                       value: PowerSupply
-                -
-                  uuid: 3baec16a16ab4891b14079d8393de482
+                - uuid: f907f076f4c04d9cb6a5d3cd4c21abeb
                   expression: 'last(/xFusion Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=3'
                   name: 'powerSupply [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
                     - tag: Application
                       value: PowerSupply
-                -
-                  uuid: 23ba8a9e49664c49832b2c1e9b5979d0
+                - uuid: 447ac618652f439aa63a12e42772cee9
                   expression: 'last(/xFusion Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=2'
                   name: 'powerSupply  [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
                     - tag: Application
                       value: PowerSupply
-        -
-          uuid: 5d0ecaaa1ff644e3a8ab3f6e447791a8
+        - uuid: 1221633cda6844968073ef6910101e9d
           name: raidControllerFwVersion
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.36.50.1.1]'
@@ -1957,8 +1683,7 @@ zabbix_export:
           lifetime: 0d
           description: 'Information about RAID controller firmware version.'
           item_prototypes:
-            -
-              uuid: 833b63a4d925451db6e3f0709490ba1f
+            - uuid: b6776a9318064ba28a0ed6263367e6e4
               name: 'raidController {#SNMPVALUE} FwVersion'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.36.50.1.8.{#SNMPINDEX}'
@@ -1968,11 +1693,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about RAID controller firmware version.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: RaidController
-        -
-          uuid: 1ab688fe32ed4f418431521a848ea699
+        - uuid: 8f760e9794da48c7b729ba78346ee65e
           name: raidControllerName
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.36.50.1.1]'
@@ -1980,8 +1703,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: aaa43f6a32804658a2be73a67626b101
+            - uuid: 9c82e6c1885849a28cd42d9ab9442436
               name: 'raidController {#SNMPVALUE} Name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.36.50.1.2.{#SNMPINDEX}'
@@ -1991,11 +1713,9 @@ zabbix_export:
               value_type: TEXT
               description: 'Information about RAID controller name.'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: RaidController
-        -
-          uuid: 28836ae2aa894d73a7d34f0030e1ae59
+        - uuid: b1a46ea824e741fe8c2eaeda93e619e1
           name: raidControllerStatus
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},.1.3.6.1.4.1.58132.2.235.1.1.36.50.1.1]'
@@ -2003,8 +1723,7 @@ zabbix_export:
           delay: 3600s
           lifetime: 0d
           item_prototypes:
-            -
-              uuid: 41fca46e59884235b9ea484cf37cb43d
+            - uuid: c57547a1a47243d8a284b5991f28724a
               name: 'raidController {#SNMPVALUE} Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.36.50.1.7.{#SNMPINDEX}'
@@ -2015,28 +1734,24 @@ zabbix_export:
               valuemap:
                 name: 'xFusion server raidControllerHealthStatus'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: RaidController
               trigger_prototypes:
-                -
-                  uuid: 76cd2a3388874566bd87df79d5d4f8f3
+                - uuid: 18b97afec88e489ca92017464cc14f5b
                   expression: '(last(/xFusion Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])>2 and last(/xFusion Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])<16 ) or last(/xFusion Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])=2'
                   name: 'raidController [{#SNMPVALUE}] status major'
                   priority: HIGH
                   tags:
                     - tag: Application
                       value: RaidController
-                -
-                  uuid: a45e69a9a58a45b494e4a3a0f094f3b0
+                - uuid: 510b329243554a4ba6bfcbb0f535971b
                   expression: 'last(/xFusion Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])=1'
                   name: 'raidController [{#SNMPVALUE}] status minor'
                   priority: WARNING
                   tags:
                     - tag: Application
                       value: RaidController
-        -
-          uuid: de8eefd722f34d83a209f1b6f7145b0c
+        - uuid: e8b03df23e0646d4ac0d857c219fe4e2
           name: temperature
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.58132.2.235.1.1.26.50.1.1,{#SNMPITEM},1.3.6.1.4.1.58132.2.235.1.1.26.50.1.2]'
@@ -2044,15 +1759,13 @@ zabbix_export:
           delay: 3600s
           filter:
             conditions:
-              -
-                macro: '{#SNMPINDEX}'
+              - macro: '{#SNMPINDEX}'
                 value: ^(2|3|4|5|6|7)$
                 formulaid: A
           lifetime: 0d
           description: 'If power off, the CPU temperature cannot be readable and is set to 65535.'
           item_prototypes:
-            -
-              uuid: 11518617bf494ccb8ce3f27360d50689
+            - uuid: a10fbb8da8f3418687314397b2d042c0
               name: '{#SNMPITEM} Temperature(°C)'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.58132.2.235.1.1.26.50.1.3.{#SNMPINDEX}'
@@ -2062,562 +1775,401 @@ zabbix_export:
               trends: 90d
               description: 'If power off, the CPU temperature cannot be readable and is set to 65535.'
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.1'
-                -
-                  type: STR_REPLACE
+                - type: STR_REPLACE
                   parameters:
                     - '6553'
                     - '65535'
               tags:
-                -
-                  tag: Application
+                - tag: Application
                   value: Temperature
           graph_prototypes:
-            -
-              uuid: 81c4072af71b4a3eb1f235cc85966796
+            - uuid: a6673096e7344ba9b242cc2b0339f822
               name: '{#SNMPITEM} Temperature'
               graph_items:
-                -
-                  color: 1A7C11
+                - color: 1A7C11
+                  calc_fnc: ALL
                   item:
                     host: 'xFusion Server iBMC Template'
                     key: 'temperatureValue[{#SNMPVALUE}]'
       macros:
-        -
-          macro: '{$SNMP_COMMUNITY}'
+        - macro: '{$SNMP_COMMUNITY}'
           value: Admin@9000
-        -
-          macro: '{$SNMP_PORT}'
+        - macro: '{$SNMP_PORT}'
           value: '161'
       valuemaps:
-        -
-          uuid: 9b4050e62e7241249a1c04ef56aba904
+        - uuid: 607179b531934f9386b58a39d4cdac25
           name: logicalDriveDiskCachePolicy
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: 'Disk''s default'
-            -
-              value: '2'
+            - value: '2'
               newvalue: Enabled
-            -
-              value: '3'
+            - value: '3'
               newvalue: Disabled
-            -
-              value: '255'
+            - value: '255'
               newvalue: Unknown
-        -
-          uuid: 26ea5121d39c497eb5a65d5c44d4beb6
+        - uuid: eb6d7901fdae41718bbd65ff05b3f347
           name: 'xFusion server cpuEntireStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
-            -
-              value: '5'
+            - value: '5'
               newvalue: absence
-            -
-              value: '6'
+            - value: '6'
               newvalue: unknown
-        -
-          uuid: c33f3654832641d49a5643722c91cfc2
+        - uuid: 905e1dc572534781b871b7eda1762d55
           name: 'xFusion server fanEntireStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
-            -
-              value: '5'
+            - value: '5'
               newvalue: absence
-            -
-              value: '6'
+            - value: '6'
               newvalue: unknown
-        -
-          uuid: fb21332b10a042769f1a8adb01b7496c
+        - uuid: 7673d2e303324302bd85fd77017965c7
           name: 'xFusion server hardDiskCapacityInGB'
           mappings:
-            -
-              value: '-1'
+            - value: '-1'
               newvalue: unknown
-        -
-          uuid: d091db7a45b744b08f06b5c0cef4dd3f
+        - uuid: 0079f0d429b14729a6e7a1586d37e597
           name: 'xFusion server hardDiskEntireStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
-            -
-              value: '5'
+            - value: '5'
               newvalue: absence
-            -
-              value: '6'
+            - value: '6'
               newvalue: unknown
-        -
-          uuid: d40b8936f62e44cbba556493b7c99709
+        - uuid: 23088faed0f94c25824b2db6059b1117
           name: 'xFusion server invalid CPU usage'
           mappings:
-            -
-              value: '65535 %'
+            - value: '65535 %'
               newvalue: 'invalid current CPU usage'
-            -
-              value: '65536'
+            - value: '65536'
               newvalue: 'invalid current CPU usage'
-        -
-          uuid: a0f70d9c19da4c4fb2e61313f5ae8dd2
+        - uuid: 180f766bad4b4c80ad1547802e21c3a8
           name: 'xFusion server invalid Memory usage'
           mappings:
-            -
-              value: '65536'
+            - value: '65536'
               newvalue: 'invalid current memory usage'
-        -
-          uuid: df76a54eb4f84bc3addf7a79dbbfe35a
+        - uuid: 9d5f0c12209f422c926a7cb3a6b575eb
           name: 'xFusion server logicalDriveState'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: offline
-            -
-              value: '2'
+            - value: '2'
               newvalue: partialdegraded
-            -
-              value: '3'
+            - value: '3'
               newvalue: degraded
-            -
-              value: '5'
+            - value: '4'
+              newvalue: optimal
+            - value: '5'
               newvalue: failed
-            -
-              value: '255'
-              newvalue: unknown
-            -
-              value: '6'
+            - value: '6'
               newvalue: NotConfigured
-            -
-              value: '7'
+            - value: '7'
               newvalue: Interimrecovery
-            -
-              value: '8'
+            - value: '8'
               newvalue: 'Ready for recovery'
-            -
-              value: '9'
+            - value: '9'
               newvalue: Recovering
-            -
-              value: '10'
+            - value: '10'
               newvalue: 'Wrong drive replaced'
-            -
-              value: '11'
+            - value: '11'
               newvalue: 'Drive improperly connected'
-            -
-              value: '12'
+            - value: '12'
               newvalue: Expanding
-            -
-              value: '13'
+            - value: '13'
               newvalue: 'Not available'
-            -
-              value: '14'
+            - value: '14'
               newvalue: 'Queued for expansion'
-            -
-              value: '15'
+            - value: '15'
               newvalue: 'Disabled from scsi id conflict'
-            -
-              value: '16'
+            - value: '16'
               newvalue: Ejected
-            -
-              value: '17'
+            - value: '17'
               newvalue: Erase-in-progress
-            -
-              value: '18'
+            - value: '18'
               newvalue: Unused
-            -
-              value: '19'
+            - value: '19'
               newvalue: 'Ready to perform predictive spare rebuild'
-            -
-              value: '20'
+            - value: '20'
               newvalue: 'RPI in progress'
-            -
-              value: '21'
+            - value: '21'
               newvalue: 'RPI queued'
-            -
-              value: '22'
+            - value: '22'
               newvalue: 'Encrypted without key'
-            -
-              value: '23'
+            - value: '23'
               newvalue: 'Encryption migration'
-            -
-              value: '24'
+            - value: '24'
               newvalue: 'Encrypted with re-keying'
-            -
-              value: '25'
+            - value: '25'
               newvalue: 'Encrypted with encryption off'
-            -
-              value: '26'
+            - value: '26'
               newvalue: 'Volume encode requested'
-            -
-              value: '27'
+            - value: '27'
               newvalue: 'Encrypted with re-key requested'
-            -
-              value: '28'
+            - value: '28'
               newvalue: 'Unsupported on this controller'
-            -
-              value: '29'
+            - value: '29'
               newvalue: 'Not Formatted'
-            -
-              value: '30'
+            - value: '30'
               newvalue: Formatting
-            -
-              value: '31'
+            - value: '31'
               newvalue: Sanitizing
-            -
-              value: '32'
+            - value: '32'
               newvalue: Initializing
-            -
-              value: '33'
+            - value: '33'
               newvalue: 'Initialize failed'
-            -
-              value: '34'
+            - value: '34'
               newvalue: Deleting
-            -
-              value: '35'
+            - value: '35'
               newvalue: 'Delete failed'
-            -
-              value: '36'
+            - value: '36'
               newvalue: Write-protect
-            -
-              value: '4'
-              newvalue: Optimal
-        -
-          uuid: 105cdaf4a44947e480563739a62fdb03
+            - value: '255'
+              newvalue: unknown
+        - uuid: b3c8a420da6847a583855fa911fb09bf
           name: 'xFusion server memoryEntireStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
-            -
-              value: '5'
+            - value: '5'
               newvalue: absence
-            -
-              value: '6'
+            - value: '6'
               newvalue: unknown
-        -
-          uuid: 99f4d28389e34b9d83ca2c16b1cc78f1
+        - uuid: bebc20eba4b94e8d933ba0427e15d8a7
           name: 'xFusion server netCardStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
-        -
-          uuid: 2c15ba782e764a929adabd959e0437ca
+        - uuid: e52c59e9809541169d57477ca3c49090
           name: 'xFusion server OCPCardAvailability'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: unknown
-            -
-              value: '2'
+            - value: '2'
               newvalue: disabled
-            -
-              value: '3'
+            - value: '3'
               newvalue: backup
-            -
-              value: '4'
+            - value: '4'
               newvalue: active
-        -
-          uuid: 5c040564f16d4785b1bb15e7ac62965a
+        - uuid: 231a08069b5d4bc78b9d0b115a063f91
           name: 'xFusion server OCPCardPresence'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: absence
-            -
-              value: '2'
+            - value: '2'
               newvalue: presence
-            -
-              value: '3'
+            - value: '3'
               newvalue: unknown
-        -
-          uuid: 9e36fdbd34a447d685eeb28d50d22478
+        - uuid: fdadd61d9680416fb84eca4ab9bf2541
           name: 'xFusion server OCPCardStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
-            -
-              value: '5'
+            - value: '5'
               newvalue: absence
-            -
-              value: '6'
+            - value: '6'
               newvalue: unknown
-        -
-          uuid: 05e6ff6e7e124dfc8178b54b67c6d067
+        - uuid: 3c28ea5a2de74fd2acec06d17403a367
           name: 'xFusion server PCIeAvailability'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: unknown
-            -
-              value: '2'
+            - value: '2'
               newvalue: disabled
-            -
-              value: '3'
+            - value: '3'
               newvalue: backup
-            -
-              value: '4'
+            - value: '4'
               newvalue: active
-        -
-          uuid: a00852cabcb04446b66201ed08a49867
+        - uuid: 053a1d2d62064ae2b79df61ff58f63b9
           name: 'xFusion server PCIeDevicePresence'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: absence
-            -
-              value: '2'
+            - value: '2'
               newvalue: presence
-            -
-              value: '3'
+            - value: '3'
               newvalue: unknown
-        -
-          uuid: 541340597f6b43e1ba768f865c8248c7
+        - uuid: a8b98c78eec2409d84de01f59d529f0d
           name: 'xFusion server PCIeDeviceStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
-            -
-              value: '5'
+            - value: '5'
               newvalue: absence
-            -
-              value: '6'
+            - value: '6'
               newvalue: unknown
-        -
-          uuid: de91d5257b72431d879091a0ec5e91cf
+        - uuid: f42777b2b6a842f583f58efff0bb0c6b
           name: 'xFusion server powerSupplyEntireStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
-            -
-              value: '5'
+            - value: '5'
               newvalue: absence
-            -
-              value: '6'
+            - value: '6'
               newvalue: unknown
-        -
-          uuid: 73d9c321f12447bc94cc09dad01b6b42
+        - uuid: 401aa48e26a1420ba9175571fcceb8db
           name: 'xFusion server raidControllerHealthStatus'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: ok
-            -
-              value: '1'
+            - value: '1'
               newvalue: 'memory correctable error'
-            -
-              value: '2'
+            - value: '2'
               newvalue: 'memory uncorrectable error'
-            -
-              value: '3'
+            - value: '3'
               newvalue: 'memory correctable error  and memory uncorrectable error'
-            -
-              value: '4'
+            - value: '4'
               newvalue: 'memory ECC error reached limit'
-            -
-              value: '5'
+            - value: '5'
               newvalue: 'memory ECC error reached limit and memory correctable error'
-            -
-              value: '6'
+            - value: '6'
               newvalue: 'memory ECC error reached limit and memory uncorrectable error'
-            -
-              value: '7'
+            - value: '7'
               newvalue: 'memory ECC error reached limit | uncorrectable|correctable error'
-            -
-              value: '8'
+            - value: '8'
               newvalue: 'NVRAM uncorrectable error'
-            -
-              value: '9'
+            - value: '9'
               newvalue: 'NVRAM uncorrectable error and memory correctable error'
-            -
-              value: '10'
+            - value: '10'
               newvalue: 'NVRAM uncorrectable error and memory uncorrectable error'
-            -
-              value: '11'
+            - value: '11'
               newvalue: 'NVRAM uncorrectable error | uncorrectable|correctable error'
-            -
-              value: '12'
+            - value: '12'
               newvalue: 'NVRAM uncorrectable error and memory ECC error reached limit'
-            -
-              value: '13'
+            - value: '13'
               newvalue: 'NVRAM uncorrectableError|ECC ErrorReachedLimit|correctableError'
-            -
-              value: '14'
+            - value: '14'
               newvalue: 'NVRAM|memory uncorrectableError|ECC ErrorReachedLimit'
-            -
-              value: '15'
+            - value: '15'
               newvalue: 'NVRAM|memory Uncorrectable Error|ECC ErrorReachedLimit'
-            -
-              value: '65535'
+            - value: '65535'
               newvalue: unknown
-        -
-          uuid: 1c516ca65f544d71adfd6da2aa0e0bf0
+        - uuid: bc12865cac894acbbe97ba90759fabff
           name: 'xFusion server systemHealth'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: ok
-            -
-              value: '2'
+            - value: '2'
               newvalue: minor
-            -
-              value: '3'
+            - value: '3'
               newvalue: major
-            -
-              value: '4'
+            - value: '4'
               newvalue: critical
   graphs:
-    -
-      uuid: 3cfbf25260fd4925b11a13571841cf08
+    - uuid: cf409b292c534129882f5b2d5e81fe66
       name: averagePower
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
+          calc_fnc: ALL
           item:
             host: 'xFusion Server iBMC Template'
             key: averagePower
-    -
-      uuid: 3d79dc435100474fad39205e87bb1250
+    - uuid: f5bcfaea3d0346fbacd4c0e5228f15a9
       name: diskPartitionUsage
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
+          calc_fnc: ALL
           item:
             host: 'xFusion Server iBMC Template'
             key: diskPartitionUsage
-    -
-      uuid: 05220b7642a1499588f3ff672136c00e
+    - uuid: d2d6dcb9f63e4968bea2360013ca103c
       name: InletTemperature
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
+          calc_fnc: ALL
           item:
             host: 'xFusion Server iBMC Template'
             key: temperatureValue
-    -
-      uuid: 3cfa65e515634eabbd5e3ce052cab3cd
+    - uuid: e13e9426d24b40478cd235ad209412e5
       name: peakPower
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
+          calc_fnc: ALL
           item:
             host: 'xFusion Server iBMC Template'
             key: peakPower
-    -
-      uuid: e37b61829b0f4709a0b48380831da599
+    - uuid: 57676f700e9e4067b7e41fd0413aaeb2
       name: powerConsumption
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
+          calc_fnc: ALL
           item:
             host: 'xFusion Server iBMC Template'
             key: powerConsumption
-    -
-      uuid: c34b7dada2bc4e529218fdeac2248184
+    - uuid: 8b0f2c66ddf94365bd6e1c4b4d67d069
       name: presentSystemPower
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
+          calc_fnc: ALL
           item:
             host: 'xFusion Server iBMC Template'
             key: presentSystemPower
-    -
-      uuid: 2729134aa28941e8879fb393d80c3178
+    - uuid: 2fdd0e5bc9fe4e63b8ad3b6fb12288da
       name: systemCpuUsage
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
           calc_fnc: ALL
           item:
             host: 'xFusion Server iBMC Template'
             key: systemCpuUsage
-    -
-      uuid: fde262583b9f47409906253c9348247a
+    - uuid: 0fdb9e1a506340918e9b5d5494835e80
       name: systemMemUsage
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
           calc_fnc: ALL
           item:
             host: 'xFusion Server iBMC Template'

@@ -713,16 +713,25 @@ zabbix_export:
                   expression: 'last(/xFusion Server iBMC Template/cpuStatus[{#SNMPVALUE}])=4'
                   name: 'cpu [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: CPU
                 -
                   uuid: 220df50c1e11433891fe62fa2a3d5b9b
                   expression: 'last(/xFusion Server iBMC Template/cpuStatus[{#SNMPVALUE}])=3'
                   name: 'cpu [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: CPU
                 -
                   uuid: 2352962d6fba48d794b3728c6554f1ae
                   expression: 'last(/xFusion Server iBMC Template/cpuStatus[{#SNMPVALUE}])=2'
                   name: 'cpu [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: CPU
         -
           uuid: bbeb2d335cdf4dfc9f589c1498c67e25
           name: cpuType
@@ -797,16 +806,25 @@ zabbix_export:
                   expression: 'last(/xFusion Server iBMC Template/fanStatus[{#SNMPVALUE}])=4'
                   name: 'fan  [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: Fan
                 -
                   uuid: 360c1333e92f4913be1d58a6cdded5e7
                   expression: 'last(/xFusion Server iBMC Template/fanStatus[{#SNMPVALUE}])=3'
                   name: 'fan [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: Fan
                 -
                   uuid: f8bcae22328e4ea3bf63bfdeb896229a
                   expression: 'last(/xFusion Server iBMC Template/fanStatus[{#SNMPVALUE}])=2'
                   name: 'fan  [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: Fan
         -
           uuid: 24e438adead641c583bc0e7995ebbeae
           name: firmwareLocation
@@ -1010,16 +1028,25 @@ zabbix_export:
                   expression: 'last(/xFusion Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=4'
                   name: 'hardDisk [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: HardDisk
                 -
                   uuid: 59915792fec64f27a73973e521166712
                   expression: 'last(/xFusion Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=3'
                   name: 'hardDisk [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: HardDisk
                 -
                   uuid: 53ef6e34f73a416b9d1876b63cd78861
                   expression: 'last(/xFusion Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=2'
                   name: 'hardDisk [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: HardDisk
         -
           uuid: 0a78824a625a47d78d1d71f0b6336aca
           name: logicalDriveName
@@ -1242,16 +1269,25 @@ zabbix_export:
                   expression: 'last(/xFusion Server iBMC Template/memoryStatus[{#SNMPVALUE}])=4'
                   name: 'memory [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: Memory
                 -
                   uuid: fc00224018f3412cb3eb677f97384333
                   expression: 'last(/xFusion Server iBMC Template/memoryStatus[{#SNMPVALUE}])=3'
                   name: 'memory [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: Memory
                 -
                   uuid: 642d325a7fc7481fb17f1a1f94d29de0
                   expression: 'last(/xFusion Server iBMC Template/memoryStatus[{#SNMPVALUE}])=2'
                   name: 'memory [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: Memory
         -
           uuid: 29ed0a0b52b44141a2eea46894d4e350
           name: netCardLocation
@@ -1892,16 +1928,25 @@ zabbix_export:
                   expression: 'last(/xFusion Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=4'
                   name: 'powerSupply [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: PowerSupply
                 -
                   uuid: 3baec16a16ab4891b14079d8393de482
                   expression: 'last(/xFusion Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=3'
                   name: 'powerSupply [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: PowerSupply
                 -
                   uuid: 23ba8a9e49664c49832b2c1e9b5979d0
                   expression: 'last(/xFusion Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=2'
                   name: 'powerSupply  [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: PowerSupply
         -
           uuid: 5d0ecaaa1ff644e3a8ab3f6e447791a8
           name: raidControllerFwVersion
@@ -1979,11 +2024,17 @@ zabbix_export:
                   expression: '(last(/xFusion Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])>2 and last(/xFusion Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])<16 ) or last(/xFusion Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])=2'
                   name: 'raidController [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: RaidController
                 -
                   uuid: a45e69a9a58a45b494e4a3a0f094f3b0
                   expression: 'last(/xFusion Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])=1'
                   name: 'raidController [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: RaidController
         -
           uuid: de8eefd722f34d83a209f1b6f7145b0c
           name: temperature
@@ -2348,7 +2399,7 @@ zabbix_export:
               newvalue: critical
             -
               value: '5'
-              newvalue: absebce
+              newvalue: absence
             -
               value: '6'
               newvalue: unknown
@@ -2399,7 +2450,7 @@ zabbix_export:
               newvalue: critical
             -
               value: '5'
-              newvalue: absebce
+              newvalue: absence
             -
               value: '6'
               newvalue: unknown
