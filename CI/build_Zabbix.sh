@@ -1,5 +1,5 @@
 #!/bin/bash
-ZABBIX_VERSION=V2.8.0
+ZABBIX_VERSION=V2.9.0
 rm -rf *.tar.gz
 echo " ${Zabbix_lan} "
 if [[ "${brand}" == "KUNLUN" ]]; then
