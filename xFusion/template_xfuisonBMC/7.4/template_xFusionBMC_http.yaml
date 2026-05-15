@@ -1,0 +1,2563 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: c0de0cb5e94646f7b3cbf25c3cb8c0a3
+      name: 'xFusion Server'
+  templates:
+    - uuid: a52da808e890463291bfd712eb9040a3
+      template: 'xFusion Server xFusionBMC Template'
+      name: 'xFusion Server xFusionBMC Template'
+      groups:
+        - name: 'xFusion Server'
+      items:
+        - uuid: 93de4af84fe843149b2ce3b09466e80a
+          name: 'Inlet Temperature'
+          type: DEPENDENT
+          key: xfusion.server.chassis.getInletTemperature
+          history: 90d
+          value_type: FLOAT
+          trends: '0'
+          units: °C
+          description: 'Get Inlet Temperature information.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.InletTemperature
+          master_item:
+            key: xfusion.server.system.getProcessorRaw
+          tags:
+            - tag: Application
+              value: Temperature
+        - uuid: fa9493252e25480694957b426039a38c
+          name: 'Get Thermal Raw'
+          type: SCRIPT
+          key: xfusion.server.chassis.getThermalRaw
+          delay: 600s
+          history: 7d
+          value_type: TEXT
+          params: |
+            // Validate whether required fields are present in the input parameters
+            function validateZabbixParams(requiredParams, allParams) {
+            	requiredParams.forEach(function (field) {
+            		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            // XFUSION Redfish request wrapper
+            function XFUSION(service, action, params) {
+            	// Zabbix log prefix for distinguishing module and action in logs
+            	this.zabbixLogPrefix = '[ XFUSION ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	// Execute a GET request to the specified Redfish API path
+            	this.executeRequest = function (apiPath) {
+            		// Use Basic Auth for authentication
+            		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
+            
+            		// If a proxy is configured, access the target through the proxy
+            		if (params['http_proxy']) {
+            			this.request.setProxy(params['http_proxy']);
+            			Zabbix.log(4, this.zabbixLogPrefix + ' Using http proxy: ' + params['http_proxy']);
+            		}
+            
+            		// Build the final request URL
+            		var finalUrl = params['url'] + apiPath;
+            		Zabbix.log(4, this.zabbixLogPrefix + ' Request URL: ' + finalUrl);
+            
+            		// Send the HTTP GET request
+            		var response = this.request.get(finalUrl);
+            
+            		// Clear request headers to avoid affecting subsequent requests
+            		this.request.clearHeader();
+            
+            		// Validate whether the returned HTTP status code matches the expected value
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbixLogPrefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            }
+            
+            // Parse parameters from the value passed by Zabbix
+            var params = JSON.parse(value);
+            
+            // Validate required parameters: endpoint URL, username, password, and expected HTTP status code
+            validateZabbixParams(['url', 'user', 'password', 'http_status_code'], params);
+            
+            // Create an XFUSION Fan query object
+            var fanApi = new XFUSION('Fan', 'Get fan raw data', params);
+            
+            // Request the server thermal resource to get the list of all fan members
+            var thermalRaw = JSON.parse(
+            	fanApi.executeRequest('/redfish/v1/Chassis/1/Thermal')
+            );
+            
+            // Validate that the Fans field exists and is an array
+            if (!thermalRaw.Fans || !Array.isArray(thermalRaw.Fans)) {
+            	throw 'Fan Members is missing or invalid.';
+            }
+            
+            // Used to store detailed information for each fan
+            var fanDetails = [];
+            
+            // Iterate through each fan member
+            for (var i = 0; i < thermalRaw.Fans.length; i++) {
+            	var fanMember = thermalRaw.Fans[i];
+            
+            	// Get the fan name and remove the "_Speed" or "_speed" suffix if present
+            	var fanName = typeof fanMember.Name === 'string'
+            		? fanMember.Name.replace(/_Speed/i, '')
+            		: null;
+            
+            	// Extract required fan fields and build a simplified fan object
+            	var fanInfo = {
+            		Name: fanName,
+            		SpeedRatio: fanMember.Oem && fanMember.Oem.xFusion ? fanMember.Oem.xFusion.SpeedRatio : null,
+            		Status: fanMember.Status ? fanMember.Status.Health : null,
+            		Model: fanMember.Model,
+            		Speed: fanMember.Reading
+            	};
+            
+            	// Add the retrieved fan details to the result array
+            	fanDetails.push(fanInfo);
+            }
+            
+            // Extract the overall fan status
+            var fanEntireStatus = null;
+            if (
+            	thermalRaw.Oem &&
+            	thermalRaw.Oem.xFusion &&
+            	thermalRaw.Oem.xFusion.FanSummary
+            ) {
+            	fanEntireStatus = thermalRaw.Oem.xFusion.FanSummary.Status || null;
+            }
+            
+            // Build the final return result
+            var result = {
+            	Fans: fanDetails,
+            	FanEntireStatus: fanEntireStatus
+            };
+            
+            // Convert the result to a JSON string and return it to Zabbix
+            return JSON.stringify(result);
+          description: 'Get thermal information.'
+          parameters:
+            - name: http_status_code
+              value: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+            - name: password
+              value: '{$XFUSION.HTTP.API.PASSWORD}'
+            - name: url
+              value: '{$XFUSION.HTTP.API.URL}'
+            - name: user
+              value: '{$XFUSION.HTTP.API.USER}'
+        - uuid: 249cd7afc4804a5f9999eb2a64a5b7a4
+          name: 'Fan Entire Health'
+          type: DEPENDENT
+          key: xfusion.server.fan.getFanEntireHealth
+          history: 90d
+          value_type: TEXT
+          description: 'Get FanEntireStatus information.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.FanEntireStatus
+          master_item:
+            key: xfusion.server.chassis.getThermalRaw
+          tags:
+            - tag: Application
+              value: EntireStatus
+        - uuid: 69771652ac764a309e80054bdcc32c37
+          name: 'Get Alarm Raw'
+          type: SCRIPT
+          key: xfusion.server.system.getAlarmRaw
+          delay: 60s
+          history: 7d
+          value_type: TEXT
+          params: |
+            // Validate required input parameters.
+            function validateZabbixParams(requiredParams, allParams) {
+            	requiredParams.forEach(function (field) {
+            		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            // Redfish helper object for sending requests and extracting data.
+            function Redfish(service, action, params) {
+            	this.zabbixLogPrefix = '[ REDFISH ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	// Execute GET request to Redfish API with Basic Authentication.
+            	this.executeRequest = function (apiPath) {
+            		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
+            
+            		const response = this.request.get(params['url'] + apiPath);
+            
+            		this.request.clearHeader();
+            
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbixLogPrefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            
+            	// Extract data from JSON response by given key definitions.
+            	this.extractData = function (data, keys, skipParse) {
+            		if (!skipParse) {
+            			try {
+            				data = JSON.parse(data);
+            			} catch (error) {
+            				Zabbix.log(3, this.zabbixLogPrefix + ' Could not parse the received JSON object: ' + data);
+            				throw 'Could not parse received JSON object. See logs for more information.';
+            			}
+            		}
+            
+            		if (Array.isArray(keys)) {
+            			var returnBuffer = {};
+            
+            			for (var keyIdx = 0, keysLength = keys.length; keyIdx < keysLength; keyIdx++) {
+            				if (keys[keyIdx]['path'] === '@odata.id') {
+            					returnBuffer[keys[keyIdx]['name']] = data[keys[keyIdx]['path']];
+            				} else {
+            					returnBuffer[keys[keyIdx]['name']] = this.parseJSON(data, keys[keyIdx]['path'].split('.'));
+            				}
+            			}
+            
+            			return returnBuffer;
+            		} else if (typeof keys === 'object') {
+            			return { [keys['name']]: this.parseJSON(data, keys['path'].split('.')) };
+            		} else if (typeof keys === 'string') {
+            			return this.parseJSON(data, keys.split('.'));
+            		} else {
+            			throw 'Unexpected key type';
+            		}
+            	};
+            
+            	// Parse nested JSON object by path array.
+            	this.parseJSON = function (data, jsonPath) {
+            		for (var i = 0, args = jsonPath.length; i < args; i++) {
+            			if (typeof data === 'undefined' || data === null) {
+            				return undefined;
+            			}
+            			data = data[jsonPath[i]];
+            		}
+            		return data;
+            	};
+            
+            	// Extract host part from base URL.
+            	this.getHost = function () {
+            		var match = params['url'].match(/^https?:\/\/([^\/:]+)/i);
+            		return match ? match[1] : params['url'];
+            	};
+            }
+            
+            // Sanitize string for safe usage in Zabbix item key / discovery macro value.
+            function sanitizeForKey(value) {
+            	if (typeof value === 'undefined' || value === null) {
+            		return 'UNKNOWN';
+            	}
+            
+            	value = String(value);
+            
+            	// Replace whitespace with underscore.
+            	value = value.replace(/\s+/g, '_');
+            
+            	// Replace characters that may break Zabbix item key parsing.
+            	value = value.replace(/[^A-Za-z0-9._-]/g, '_');
+            
+            	// Collapse multiple underscores.
+            	value = value.replace(/_+/g, '_');
+            
+            	// Trim leading/trailing underscores.
+            	value = value.replace(/^_+|_+$/g, '');
+            
+            	if (value === '') {
+            		return 'UNKNOWN';
+            	}
+            
+            	return value;
+            }
+            
+            const params = JSON.parse(value);
+            
+            // Validate mandatory parameters before execution.
+            validateZabbixParams(['url', 'user', 'password', 'http_status_code'], params);
+            
+            var redfish = new Redfish('LogService', 'GetEntries', params);
+            
+            // Get all available log services under the target system.
+            const logServices = redfish.extractData(
+            	redfish.executeRequest('/redfish/v1/Systems/1/LogServices'),
+            	'Members'
+            );
+            
+            if (!Array.isArray(logServices)) {
+            	throw 'Unexpected type for logServices.';
+            }
+            
+            // Define log entry fields to be returned.
+            const detailKeys = [
+            	{
+            		'name': 'Id',
+            		'path': 'Id'
+            	},
+            	{
+            		'name': 'EventId',
+            		'path': 'EventId'
+            	},
+            	{
+            		'name': 'EventTimestamp',
+            		'path': 'EventTimestamp'
+            	},
+            	{
+            		'name': 'Severity',
+            		'path': 'Severity'
+            	},
+            	{
+            		'name': 'Message',
+            		'path': 'Message'
+            	}
+            ];
+            
+            // Return plain array as requested.
+            var buffer = [];
+            
+            // Iterate through each log service.
+            logServices.forEach(function (logServiceRef) {
+            	if (!logServiceRef['@odata.id']) {
+            		return;
+            	}
+            
+            	// Get log service details and find its entries collection path.
+            	const logServiceData = JSON.parse(redfish.executeRequest(logServiceRef['@odata.id']));
+            	const entriesPath = redfish.parseJSON(logServiceData, ['Entries', '@odata.id']);
+            
+            	if (!entriesPath) {
+            		return;
+            	}
+            
+            	// Get all log entry references from the entries collection.
+            	const entries = redfish.extractData(
+            		redfish.executeRequest(entriesPath),
+            		'Members'
+            	);
+            
+            	if (!Array.isArray(entries)) {
+            		return;
+            	}
+            
+            	// Iterate through each log entry and collect required fields.
+            	entries.forEach(function (entryRef) {
+            		if (!entryRef['@odata.id']) {
+            			return;
+            		}
+            
+            		var logDetail = redfish.extractData(
+            			redfish.executeRequest(entryRef['@odata.id']),
+            			detailKeys
+            		);
+            
+            		// EventId is mandatory for unique event identification.
+            		// If EventId is missing, skip this record.
+            		if (!logDetail['EventId']) {
+            			return;
+            		}
+            
+            		var eventId = logDetail['EventId'];
+            		var eventTimestamp = logDetail['EventTimestamp'] || 'UNKNOWN';
+            		var message = logDetail['Message'] || 'UNKNOWN';
+            
+            		// EVENTKEY = EventTimestamp + "_" + EventId + "_" + sanitize(Message)
+            		var eventKey = sanitizeForKey(eventTimestamp) + '_' +
+            			sanitizeForKey(eventId) + '_' +
+            			sanitizeForKey(message);
+            
+            		// Map severity to monitoring state.
+            		var state = (logDetail['Severity'] === 'Critical' || logDetail['Severity'] === 'Warning') ? 'Problem' : 'OK';
+            
+            		buffer.push({
+            			'EventKey': eventKey,
+            			'Id': String(logDetail['Id'] || ''),
+            			'EventId': String(eventId),
+            			'EventTimestamp': String(eventTimestamp),
+            			'Severity': String(logDetail['Severity'] || ''),
+            			'Message': String(message),
+            			'State': String(state),
+            			'Host': String(redfish.getHost())
+            		});
+            	});
+            });
+            
+            // Return plain JSON array.
+            return JSON.stringify(buffer);
+          description: 'Get Alarm information.'
+          parameters:
+            - name: http_status_code
+              value: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+            - name: password
+              value: '{$XFUSION.HTTP.API.PASSWORD}'
+            - name: url
+              value: '{$XFUSION.HTTP.API.URL}'
+            - name: user
+              value: '{$XFUSION.HTTP.API.USER}'
+        - uuid: 0edc31aece9e47409863691f3a5a8cd9
+          name: 'Get HardDisk Raw'
+          type: SCRIPT
+          key: xfusion.server.system.getHardDiskRaw
+          delay: 600s
+          history: 7d
+          value_type: TEXT
+          params: |
+            // Validate whether required fields are present in the input parameters
+            function validateZabbixParams(requiredParams, allParams) {
+            	requiredParams.forEach(function (field) {
+            		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            // XFUSION Redfish request wrapper
+            function XFUSION(service, action, params) {
+            	// Zabbix log prefix for distinguishing module and action in logs
+            	this.zabbixLogPrefix = '[ XFUSION ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	// Execute a GET request to the specified Redfish API path
+            	this.executeRequest = function (apiPath) {
+            		// Use Basic Auth for authentication
+            		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
+            
+            		// If a proxy is configured, access the target through the proxy
+            		if (params['http_proxy']) {
+            			this.request.setProxy(params['http_proxy']);
+            			Zabbix.log(4, this.zabbixLogPrefix + ' Using http proxy: ' + params['http_proxy']);
+            		}
+            
+            		// Build the final request URL
+            		var finalUrl = params['url'] + apiPath;
+            		Zabbix.log(4, this.zabbixLogPrefix + ' Request URL: ' + finalUrl);
+            
+            		// Send the HTTP GET request
+            		var response = this.request.get(finalUrl);
+            
+            		// Clear request headers to avoid affecting subsequent requests
+            		this.request.clearHeader();
+            
+            		// Validate whether the returned HTTP status code matches the expected value
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbixLogPrefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            }
+            
+            // Parse parameters from the value passed by Zabbix
+            var params = JSON.parse(value);
+            
+            // Validate required parameters: endpoint URL, username, password, and expected HTTP status code
+            validateZabbixParams(['url', 'user', 'password', 'http_status_code'], params);
+            
+            // Create an XFUSION HardDisk query object
+            var hardDiskApi = new XFUSION('HardDisk', 'Get hard disk raw data', params);
+            
+            // Request the drive collection resource to get the list of all drive members
+            var hardDiskCollection = JSON.parse(
+            	hardDiskApi.executeRequest('/redfish/v1/Chassis/1/Drives')
+            );
+            
+            // Validate that the Members field exists and is an array
+            if (!hardDiskCollection.Members || !Array.isArray(hardDiskCollection.Members)) {
+            	throw 'HardDisk Members is missing or invalid.';
+            }
+            
+            // Used to store detailed information for each drive
+            var hardDiskDetails = [];
+            
+            // Iterate through each drive member
+            for (var i = 0; i < hardDiskCollection.Members.length; i++) {
+            	var hardDiskMember = hardDiskCollection.Members[i];
+            
+            	// Skip the current member if @odata.id is missing
+            	if (!hardDiskMember['@odata.id']) {
+            		continue;
+            	}
+            
+            	// Get the resource path of the current drive member
+            	var hardDiskOdataId = hardDiskMember['@odata.id'];
+            
+            	// Retrieve the complete raw data for the individual drive from its detail endpoint
+            	var hardDiskRaw = JSON.parse(hardDiskApi.executeRequest(hardDiskOdataId));
+            
+            	// Convert drive capacity from bytes to GB and keep 2 decimal places
+            	var hardDiskCapacityInGB = hardDiskRaw.CapacityBytes != null
+            		? (hardDiskRaw.CapacityBytes / 1073741824).toFixed(2)
+            		: null;
+            
+            	// Extract required drive fields and build a simplified drive object
+            	var hardDiskInfo = {
+            		Name: hardDiskRaw.Name,
+            		CapacityInGB: hardDiskCapacityInGB,
+            		Manufacturer: hardDiskRaw.Manufacturer,
+            		Model: hardDiskRaw.Model,
+            		SerialNumber: hardDiskRaw.SerialNumber,
+            		Health: hardDiskRaw.Status ? hardDiskRaw.Status.Health : null,
+            		MediaType: hardDiskRaw.MediaType,
+            		Temperature: hardDiskRaw.Oem && hardDiskRaw.Oem.xFusion ? hardDiskRaw.Oem.xFusion.Temperature : null,
+            		Revision: hardDiskRaw.Revision,
+            		LifeUsed: hardDiskRaw.Oem && hardDiskRaw.Oem.xFusion ? hardDiskRaw.Oem.xFusion.LifeUsed : null,
+            		DeviceLocator: hardDiskRaw.Oem && hardDiskRaw.Oem.xFusion ? hardDiskRaw.Oem.xFusion.SlotNumber : null,
+            		Protocol: hardDiskRaw.Protocol
+            	};
+            
+            	// Add the retrieved drive details to the result array
+            	hardDiskDetails.push(hardDiskInfo);
+            }
+            
+            // Convert all drive details to a JSON string and return it to Zabbix
+            return JSON.stringify(hardDiskDetails);
+          description: 'Get hard disk information.'
+          parameters:
+            - name: http_status_code
+              value: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+            - name: password
+              value: '{$XFUSION.HTTP.API.PASSWORD}'
+            - name: url
+              value: '{$XFUSION.HTTP.API.URL}'
+            - name: user
+              value: '{$XFUSION.HTTP.API.USER}'
+        - uuid: b6c8dff821e843ac96629ba9cd0c31dd
+          name: 'Get Memory Raw'
+          type: SCRIPT
+          key: xfusion.server.system.getMemoryRaw
+          delay: 600s
+          history: 7d
+          value_type: TEXT
+          params: |
+            // Validate whether required fields are present in the input parameters
+            function validateZabbixParams(requiredParams, allParams) {
+            	requiredParams.forEach(function (field) {
+            		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            // XFUSION Redfish request wrapper
+            function XFUSION(service, action, params) {
+            	// Zabbix log prefix for distinguishing module and action in logs
+            	this.zabbixLogPrefix = '[ XFUSION ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	// Execute a GET request to the specified Redfish API path
+            	this.executeRequest = function (apiPath) {
+            		// Use Basic Auth for authentication
+            		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
+            
+            		// If a proxy is configured, access the target through the proxy
+            		if (params['http_proxy']) {
+            			this.request.setProxy(params['http_proxy']);
+            			Zabbix.log(4, this.zabbixLogPrefix + ' Using http proxy: ' + params['http_proxy']);
+            		}
+            
+            		// Build the final request URL
+            		var finalUrl = params['url'] + apiPath;
+            		Zabbix.log(4, this.zabbixLogPrefix + ' Request URL: ' + finalUrl);
+            
+            		// Send the HTTP GET request
+            		var response = this.request.get(finalUrl);
+            
+            		// Clear request headers to avoid affecting subsequent requests
+            		this.request.clearHeader();
+            
+            		// Validate whether the returned HTTP status code matches the expected value
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbixLogPrefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            }
+            
+            // Parse parameters from the value passed by Zabbix
+            var params = JSON.parse(value);
+            
+            // Validate required parameters: endpoint URL, username, password, and expected HTTP status code
+            validateZabbixParams(['url', 'user', 'password', 'http_status_code'], params);
+            
+            // Create an XFUSION Memory query object
+            var memoryApi = new XFUSION('Memory', 'Get memory raw data', params);
+            
+            // Request the memory collection resource to get the list of all memory module members
+            var memoryCollection = JSON.parse(
+            	memoryApi.executeRequest('/redfish/v1/Systems/1/Memory')
+            );
+            
+            // Validate that the Members field exists and is an array
+            if (!memoryCollection.Members || !Array.isArray(memoryCollection.Members)) {
+            	throw 'Memory Members is missing or invalid.';
+            }
+            
+            // Used to store detailed information for each memory module
+            var memoryDetails = [];
+            
+            // Iterate through each memory member
+            for (var i = 0; i < memoryCollection.Members.length; i++) {
+            	var memoryMember = memoryCollection.Members[i];
+            
+            	// Skip the current member if @odata.id is missing
+            	if (!memoryMember['@odata.id']) {
+            		continue;
+            	}
+            
+            	// Get the resource path of the current memory member
+            	var memoryOdataId = memoryMember['@odata.id'];
+            
+            	// Extract the number after the last "/" from @odata.id as the memory index
+            	var memoryIndexText = memoryOdataId.substring(memoryOdataId.lastIndexOf('/') + 1);
+            	var memoryIndex = parseInt(memoryIndexText, 10);
+            
+            	// Generate a display name based on the memory index, such as Memory1, Memory2
+            	var memoryShowName = isNaN(memoryIndex) ? memoryOdataId : ('Memory' + (memoryIndex + 1));
+            
+            	// Retrieve the complete raw data for the individual memory module from its detail endpoint
+            	var memoryRaw = JSON.parse(memoryApi.executeRequest(memoryOdataId));
+            
+            	// Extract required memory fields and build a simplified memory object
+            	var memoryInfo = {
+            		Name: memoryShowName,
+            		Manufacturer: memoryRaw.Manufacturer,
+            		PartNumber: memoryRaw.PartNumber,
+            		SerialNumber: memoryRaw.SerialNumber,
+            		CapacityMiB: memoryRaw.CapacityMiB,
+            		OperatingSpeedMhz: memoryRaw.OperatingSpeedMhz,
+            		MemoryDeviceType: memoryRaw.MemoryDeviceType,
+            		Health: memoryRaw.Status ? memoryRaw.Status.Health : null,
+            		MemoryUsagePercent: memoryRaw.Oem && memoryRaw.Oem.xFusion ? memoryRaw.Oem.xFusion.MemoryUsagePercent : null,
+            		Temperature: memoryRaw.Oem && memoryRaw.Oem.xFusion ? memoryRaw.Oem.xFusion.Temperature : null
+            	};
+            
+            	// Add the retrieved memory details to the result array
+            	memoryDetails.push(memoryInfo);
+            }
+            
+            // Convert all memory module details to a JSON string and return it to Zabbix
+            return JSON.stringify(memoryDetails);
+          description: 'Get memory information.'
+          parameters:
+            - name: http_status_code
+              value: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+            - name: password
+              value: '{$XFUSION.HTTP.API.PASSWORD}'
+            - name: url
+              value: '{$XFUSION.HTTP.API.URL}'
+            - name: user
+              value: '{$XFUSION.HTTP.API.USER}'
+        - uuid: 3595ac85dc574ccdbe8e94b7b062045a
+          name: 'Get PCIeDevice Raw'
+          type: SCRIPT
+          key: xfusion.server.system.getPCIeDeviceRaw
+          delay: 600s
+          history: 7d
+          value_type: TEXT
+          params: |
+            // Validate whether required fields are present in the input parameters
+            function validateZabbixParams(requiredParams, allParams) {
+            	requiredParams.forEach(function (field) {
+            		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            // XFUSION Redfish request wrapper
+            function XFUSION(service, action, params) {
+            	// Zabbix log prefix for distinguishing module and action in logs
+            	this.zabbixLogPrefix = '[ XFUSION ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	// Execute a GET request to the specified Redfish API path
+            	this.executeRequest = function (apiPath) {
+            		// Use Basic Auth for authentication
+            		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
+            
+            		// If a proxy is configured, access the target through the proxy
+            		if (params['http_proxy']) {
+            			this.request.setProxy(params['http_proxy']);
+            			Zabbix.log(4, this.zabbixLogPrefix + ' Using http proxy: ' + params['http_proxy']);
+            		}
+            
+            		// Build the final request URL
+            		var finalUrl = params['url'] + apiPath;
+            		Zabbix.log(4, this.zabbixLogPrefix + ' Request URL: ' + finalUrl);
+            
+            		// Send the HTTP GET request
+            		var response = this.request.get(finalUrl);
+            
+            		// Clear request headers to avoid affecting subsequent requests
+            		this.request.clearHeader();
+            
+            		// Validate whether the returned HTTP status code matches the expected value
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbixLogPrefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            }
+            
+            // Parse parameters from the value passed by Zabbix
+            var params = JSON.parse(value);
+            
+            // Validate required parameters: endpoint URL, username, password, and expected HTTP status code
+            validateZabbixParams(['url', 'user', 'password', 'http_status_code'], params);
+            
+            // Create an XFUSION PCIeDevice query object
+            var pcieDeviceApi = new XFUSION('PCIeDevice', 'Get PCIe device raw data', params);
+            
+            // Request the PCIe device collection resource to get the list of all PCIe device members
+            var pcieDeviceCollection = JSON.parse(
+            	pcieDeviceApi.executeRequest('/redfish/v1/Chassis/1/PCIeDevices')
+            );
+            
+            // Validate that the Members field exists and is an array
+            if (!pcieDeviceCollection.Members || !Array.isArray(pcieDeviceCollection.Members)) {
+            	throw 'PCIeDevice Members is missing or invalid.';
+            }
+            
+            // Used to store detailed information for each PCIe device
+            var pcieDeviceDetails = [];
+            
+            // Iterate through each PCIe device member
+            for (var i = 0; i < pcieDeviceCollection.Members.length; i++) {
+            	var pcieDeviceMember = pcieDeviceCollection.Members[i];
+            
+            	// Skip the current member if @odata.id is missing
+            	if (!pcieDeviceMember['@odata.id']) {
+            		continue;
+            	}
+            
+            	// Get the resource path of the current PCIe device member
+            	var pcieDeviceOdataId = pcieDeviceMember['@odata.id'];
+            
+            	// Retrieve the complete raw data for the individual PCIe device from its detail endpoint
+            	var pcieDeviceRaw = JSON.parse(pcieDeviceApi.executeRequest(pcieDeviceOdataId));
+            
+            	// Extract the first device information from the OEM extended card info
+            	var extendCardInfo = null;
+            	if (
+            		pcieDeviceRaw.Oem &&
+            		pcieDeviceRaw.Oem.xFusion &&
+            		pcieDeviceRaw.Oem.xFusion.ExtendCardInfo &&
+            		Array.isArray(pcieDeviceRaw.Oem.xFusion.ExtendCardInfo) &&
+            		pcieDeviceRaw.Oem.xFusion.ExtendCardInfo.length > 0
+            	) {
+            		extendCardInfo = pcieDeviceRaw.Oem.xFusion.ExtendCardInfo[0];
+            	}
+            
+            	// Extract required PCIe device fields and build a simplified PCIe device object
+            	var pcieDeviceInfo = {
+            		Health: pcieDeviceRaw.Status ? pcieDeviceRaw.Status.Health : null,
+            		Manufacturer: pcieDeviceRaw.Manufacturer,
+            		SlotNumber: pcieDeviceRaw.Oem && pcieDeviceRaw.Oem.xFusion ? pcieDeviceRaw.Oem.xFusion.SlotNumber : null,
+            		FunctionType: pcieDeviceRaw.Oem && pcieDeviceRaw.Oem.xFusion ? pcieDeviceRaw.Oem.xFusion.FunctionType : null,
+            		DeviceId: extendCardInfo ? extendCardInfo.DeviceId : null,
+            		Name: pcieDeviceRaw.Name,
+            		Description: pcieDeviceRaw.Description,
+            		Model: pcieDeviceRaw.Model,
+            		Id: pcieDeviceRaw.Id,
+            		Position: pcieDeviceRaw.Oem && pcieDeviceRaw.Oem.xFusion ? pcieDeviceRaw.Oem.xFusion.Position : null
+            	};
+            
+            	// Add the retrieved PCIe device details to the result array
+            	pcieDeviceDetails.push(pcieDeviceInfo);
+            }
+            
+            // Convert all PCIe device details to a JSON string and return it to Zabbix
+            return JSON.stringify(pcieDeviceDetails);
+          description: 'Get PCIe device information.'
+          parameters:
+            - name: http_status_code
+              value: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+            - name: password
+              value: '{$XFUSION.HTTP.API.PASSWORD}'
+            - name: url
+              value: '{$XFUSION.HTTP.API.URL}'
+            - name: user
+              value: '{$XFUSION.HTTP.API.USER}'
+        - uuid: d4f1b1e964d7465a8f990c2927f9c027
+          name: 'Get PowerSupply Raw'
+          type: SCRIPT
+          key: xfusion.server.system.getPowerSupplyRaw
+          delay: 600s
+          history: 7d
+          value_type: TEXT
+          params: |
+            // Validate whether required fields are present in the input parameters
+            function validateZabbixParams(requiredParams, allParams) {
+            	requiredParams.forEach(function (field) {
+            		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            // XFUSION Redfish request wrapper
+            function XFUSION(service, action, params) {
+            	// Zabbix log prefix for distinguishing module and action in logs
+            	this.zabbixLogPrefix = '[ XFUSION ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	// Execute a GET request to the specified Redfish API path
+            	this.executeRequest = function (apiPath) {
+            		// Use Basic Auth for authentication
+            		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
+            
+            		// If a proxy is configured, access the target through the proxy
+            		if (params['http_proxy']) {
+            			this.request.setProxy(params['http_proxy']);
+            			Zabbix.log(4, this.zabbixLogPrefix + ' Using http proxy: ' + params['http_proxy']);
+            		}
+            
+            		// Build the final request URL
+            		var finalUrl = params['url'] + apiPath;
+            		Zabbix.log(4, this.zabbixLogPrefix + ' Request URL: ' + finalUrl);
+            
+            		// Send the HTTP GET request
+            		var response = this.request.get(finalUrl);
+            
+            		// Clear request headers to avoid affecting subsequent requests
+            		this.request.clearHeader();
+            
+            		// Validate whether the returned HTTP status code matches the expected value
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbixLogPrefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            }
+            
+            // Parse parameters from the value passed by Zabbix
+            var params = JSON.parse(value);
+            
+            // Validate required parameters: endpoint URL, username, password, and expected HTTP status code
+            validateZabbixParams(['url', 'user', 'password', 'http_status_code'], params);
+            
+            // Create an XFUSION PowerSupply query object
+            var powerSupplyApi = new XFUSION('PowerSupply', 'Get power supply raw data', params);
+            
+            // Request the power resource to get the list of all power supply members
+            var powerRaw = JSON.parse(
+            	powerSupplyApi.executeRequest('/redfish/v1/Chassis/1/Power')
+            );
+            
+            // Validate that the PowerSupplies field exists and is an array
+            if (!powerRaw.PowerSupplies || !Array.isArray(powerRaw.PowerSupplies)) {
+            	throw 'PowerSupplies data is missing or invalid.';
+            }
+            
+            // Used to store detailed information for each power supply
+            var powerSupplyDetails = [];
+            
+            // Iterate through each power supply member
+            for (var i = 0; i < powerRaw.PowerSupplies.length; i++) {
+            	var powerSupplyMember = powerRaw.PowerSupplies[i];
+            
+            	// Extract required power supply fields and build a simplified power supply object
+            	var powerSupplyInfo = {
+            		Name: 'powerSupply ' + (i + 1),
+            		Health: powerSupplyMember.Status ? powerSupplyMember.Status.Health : null,
+            		OutputVoltage: powerSupplyMember.Oem && powerSupplyMember.Oem.xFusion ? powerSupplyMember.Oem.xFusion.OutputVoltage : null,
+            		OutputCurrent: powerSupplyMember.Oem && powerSupplyMember.Oem.xFusion ? powerSupplyMember.Oem.xFusion.OutputAmperage : null,
+            		PowerOutput: powerSupplyMember.Oem && powerSupplyMember.Oem.xFusion ? powerSupplyMember.Oem.xFusion.PowerOutputWatts : null,
+            		PowerSupplyType: powerSupplyMember.PowerSupplyType,
+            		LineInputVoltage: powerSupplyMember.LineInputVoltage,
+            		PowerCapacityWatts: powerSupplyMember.PowerCapacityWatts,
+            		Model: powerSupplyMember.Model,
+            		FirmwareVersion: powerSupplyMember.FirmwareVersion,
+            		SerialNumber: powerSupplyMember.SerialNumber,
+            		Manufacturer: powerSupplyMember.Manufacturer,
+            		SlotNumber: powerSupplyMember.Oem && powerSupplyMember.Oem.xFusion ? powerSupplyMember.Oem.xFusion.SlotNumber : null,
+            		WorkMode: powerSupplyMember.Oem && powerSupplyMember.Oem.xFusion ? powerSupplyMember.Oem.xFusion.WorkMode : null,
+            		FanSpeed: powerSupplyMember.Oem && powerSupplyMember.Oem.xFusion ? powerSupplyMember.Oem.xFusion.FanSpeed : null,
+            		CommunicationStatus: powerSupplyMember.Oem && powerSupplyMember.Oem.xFusion ? powerSupplyMember.Oem.xFusion.CommunicationStatus : null,
+            		Temperature: powerSupplyMember.Oem && powerSupplyMember.Oem.xFusion ? powerSupplyMember.Oem.xFusion.Temperature : null
+            	};
+            
+            	// Add the retrieved power supply details to the result array
+            	powerSupplyDetails.push(powerSupplyInfo);
+            }
+            
+            // Convert all power supply details to a JSON string and return it to Zabbix
+            return JSON.stringify(powerSupplyDetails);
+          description: 'Get power supply information.'
+          parameters:
+            - name: http_status_code
+              value: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+            - name: password
+              value: '{$XFUSION.HTTP.API.PASSWORD}'
+            - name: url
+              value: '{$XFUSION.HTTP.API.URL}'
+            - name: user
+              value: '{$XFUSION.HTTP.API.USER}'
+        - uuid: 96756bfb43a94b7e811be07d44ea6a96
+          name: 'Get CPU Raw'
+          type: SCRIPT
+          key: xfusion.server.system.getProcessorRaw
+          delay: 600s
+          history: 7d
+          value_type: TEXT
+          params: |
+            // Validate whether required fields are present in the input parameters
+            function validateZabbixParams(requiredParams, allParams) {
+            	requiredParams.forEach(function (field) {
+            		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            // XFUSION Redfish request wrapper
+            function XFUSION(service, action, params) {
+            	// Zabbix log prefix for distinguishing module and action in logs
+            	this.zabbixLogPrefix = '[ XFUSION ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	// Execute a GET request to the specified Redfish API path
+            	this.executeRequest = function (apiPath) {
+            		// Use Basic Auth for authentication
+            		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
+            
+            		// If a proxy is configured, access the target through the proxy
+            		if (params['http_proxy']) {
+            			this.request.setProxy(params['http_proxy']);
+            			Zabbix.log(4, this.zabbixLogPrefix + ' Using http proxy: ' + params['http_proxy']);
+            		}
+            
+            		// Build the final request URL
+            		var finalUrl = params['url'] + apiPath;
+            		Zabbix.log(4, this.zabbixLogPrefix + ' Request URL: ' + finalUrl);
+            
+            		// Send the HTTP GET request
+            		var response = this.request.get(finalUrl);
+            
+            		// Clear request headers to avoid affecting subsequent requests
+            		this.request.clearHeader();
+            
+            		// Validate whether the returned HTTP status code matches the expected value
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbixLogPrefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            }
+            
+            // Parse parameters from the value passed by Zabbix
+            var params = JSON.parse(value);
+            
+            // Validate required parameters: endpoint URL, username, password, and expected HTTP status code
+            validateZabbixParams(['url', 'user', 'password', 'http_status_code'], params);
+            
+            // Create an XFUSION Processor query object
+            var processorApi = new XFUSION('Processor', 'Get processor raw data', params);
+            
+            // Request the processor collection resource to get the list of all processor members
+            var processorCollection = JSON.parse(
+            	processorApi.executeRequest('/redfish/v1/Systems/1/Processors')
+            );
+            
+            // Validate that the Members field exists and is an array
+            if (!processorCollection.Members || !Array.isArray(processorCollection.Members)) {
+            	throw 'Processor Members is missing or invalid.';
+            }
+            
+            // Used to store detailed information for each processor
+            var processorDetails = [];
+            
+            // Iterate through each processor member
+            for (var i = 0; i < processorCollection.Members.length; i++) {
+            	var processorMember = processorCollection.Members[i];
+            
+            	// Skip the current member if @odata.id is missing
+            	if (!processorMember['@odata.id']) {
+            		continue;
+            	}
+            
+            	// Get the resource path of the current processor member
+            	var processorOdataId = processorMember['@odata.id'];
+            
+            	// Retrieve the complete raw data for the individual processor from its detail endpoint
+            	var processorRaw = JSON.parse(processorApi.executeRequest(processorOdataId));
+            
+            	// Extract required processor fields and build a simplified processor object
+            	var processorInfo = {
+            		Manufacturer: processorRaw.Manufacturer,
+            		Status: processorRaw.Status ? processorRaw.Status.Health : null,
+            		Type: processorRaw.Model,
+            		Name: processorRaw.Name,
+            		Architecture: processorRaw.ProcessorArchitecture,
+            		MaxSpeedMHz: processorRaw.MaxSpeedMHz,
+            		SerialNumber: processorRaw.Oem && processorRaw.Oem.xFusion ? processorRaw.Oem.xFusion.SerialNumber : null,
+            		Family: processorRaw.ProcessorId ? processorRaw.ProcessorId.EffectiveFamily : null,
+            		Temperature: processorRaw.Oem && processorRaw.Oem.xFusion ? processorRaw.Oem.xFusion.Temperature : null
+            	};
+            
+            	// Add the retrieved processor details to the result array
+            	processorDetails.push(processorInfo);
+            }
+            
+            // Request the thermal resource to get temperature sensor information
+            var thermalRaw = JSON.parse(
+            	processorApi.executeRequest('/redfish/v1/Chassis/1/Thermal')
+            );
+            
+            // Initialize inlet temperature as null by default
+            var inletTemperature = null;
+            
+            // Validate that the Temperatures field exists and is an array
+            if (thermalRaw.Temperatures && Array.isArray(thermalRaw.Temperatures)) {
+            	// Iterate through all temperature sensors to find Inlet Temperature
+            	for (var j = 0; j < thermalRaw.Temperatures.length; j++) {
+            		var temperatureMember = thermalRaw.Temperatures[j];
+            
+            		if (temperatureMember.Name === 'Inlet_Temp') {
+            			inletTemperature = temperatureMember.ReadingCelsius;
+            			break;
+            		}
+            	}
+            }
+            
+            // Build the final return result
+            var result = {
+            	Processors: processorDetails,
+            	InletTemperature: inletTemperature
+            };
+            
+            // Convert the result to a JSON string and return it to Zabbix
+            return JSON.stringify(result);
+          description: 'Get CPU information.'
+          parameters:
+            - name: http_status_code
+              value: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+            - name: password
+              value: '{$XFUSION.HTTP.API.PASSWORD}'
+            - name: url
+              value: '{$XFUSION.HTTP.API.URL}'
+            - name: user
+              value: '{$XFUSION.HTTP.API.USER}'
+        - uuid: 3c4b0824788a458bb485397bc053413e
+          name: 'Get System Raw'
+          type: SCRIPT
+          key: xfusion.server.system.getSystemRaw
+          delay: 60s
+          history: 7d
+          value_type: TEXT
+          params: |
+            // Validate whether required fields are present in the input parameters
+            function validateZabbixParams(requiredParams, allParams) {
+            	requiredParams.forEach(function (field) {
+            		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            // XFUSION Redfish request wrapper
+            function XFUSION(service, action, params) {
+            	// Zabbix log prefix for distinguishing module and action in logs
+            	this.zabbixLogPrefix = '[ XFUSION ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	// Execute a GET request to the specified Redfish API path
+            	this.executeRequest = function (apiPath) {
+            		// Use Basic Auth for authentication
+            		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
+            
+            		// If a proxy is configured, access the target through the proxy
+            		if (params['http_proxy']) {
+            			this.request.setProxy(params['http_proxy']);
+            			Zabbix.log(4, this.zabbixLogPrefix + ' Using http proxy: ' + params['http_proxy']);
+            		}
+            
+            		// Build the final request URL
+            		var finalUrl = params['url'] + apiPath;
+            		Zabbix.log(4, this.zabbixLogPrefix + ' Request URL: ' + finalUrl);
+            
+            		// Send the HTTP GET request
+            		var response = this.request.get(finalUrl);
+            
+            		// Clear request headers to avoid affecting subsequent requests
+            		this.request.clearHeader();
+            
+            		// Validate whether the returned HTTP status code matches the expected value
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbixLogPrefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            }
+            
+            // Parse parameters from the value passed by Zabbix
+            var params = JSON.parse(value);
+            
+            // Validate required parameters: endpoint URL, username, password, and expected HTTP status code
+            validateZabbixParams(['url', 'user', 'password', 'http_status_code'], params);
+            
+            // Create an XFUSION System query object
+            var systemApi = new XFUSION('System', 'Get system raw data', params);
+            
+            // Request the system collection resource to get the list of all system members
+            var systemCollection = JSON.parse(
+            	systemApi.executeRequest('/redfish/v1/Systems')
+            );
+            
+            // Validate that the Members field exists and is an array
+            if (!systemCollection.Members || !Array.isArray(systemCollection.Members)) {
+            	throw 'System Members is missing or invalid.';
+            }
+            
+            // Used to store detailed information for each system
+            var systemDetails = [];
+            
+            // Iterate through each system member
+            for (var i = 0; i < systemCollection.Members.length; i++) {
+            	var systemMember = systemCollection.Members[i];
+            
+            	// Skip the current member if @odata.id is missing
+            	if (!systemMember['@odata.id']) {
+            		continue;
+            	}
+            
+            	// Get the resource path of the current system member
+            	var systemOdataId = systemMember['@odata.id'];
+            
+            	// Retrieve the complete raw data for the individual system from its detail endpoint
+            	var systemRaw = JSON.parse(systemApi.executeRequest(systemOdataId));
+            
+            	// Extract required system fields and build a simplified system object
+            	var systemInfo = {
+            		SystemMemUsage: systemRaw.Oem && systemRaw.Oem.xFusion ? systemRaw.Oem.xFusion.MemoryUsagePercent : null,
+            		SystemHealth: systemRaw.Status ? systemRaw.Status.Health : null,
+            		SystemGuid: systemRaw.UUID,
+            		SystemCpuUsage: systemRaw.Oem && systemRaw.Oem.xFusion ? systemRaw.Oem.xFusion.CPUUsagePercent : null,
+            		SysName: systemRaw.Name,
+            		HostName: systemRaw.HostName,
+            		DeviceSerialNo: systemRaw.SerialNumber,
+            		Model: systemRaw.Model,
+            		BiosVersion: systemRaw.BiosVersion,
+            		PartNumber: systemRaw.PartNumber,
+            		CPUEntireStatus: systemRaw.ProcessorSummary && systemRaw.ProcessorSummary.Status ? systemRaw.ProcessorSummary.Status.Health : null,
+            		MemoryEntireStatus: systemRaw.ProcessorSummary && systemRaw.MemorySummary.Status ? systemRaw.MemorySummary.Status.Health : null
+            	};
+            
+            	// Add the retrieved system details to the result array
+            	systemDetails.push(systemInfo);
+            }
+            
+            // Convert all system details to a JSON string and return it to Zabbix
+            return JSON.stringify(systemDetails);
+          description: 'Get system information.'
+          parameters:
+            - name: http_status_code
+              value: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+            - name: password
+              value: '{$XFUSION.HTTP.API.PASSWORD}'
+            - name: url
+              value: '{$XFUSION.HTTP.API.URL}'
+            - name: user
+              value: '{$XFUSION.HTTP.API.USER}'
+      discovery_rules:
+        - uuid: 7bbd83492d5f49f0bcb86daaae8b231d
+          name: alarm.Discovery
+          type: DEPENDENT
+          key: xfusion.server.alarm.Discovery
+          lifetime: 90d
+          item_prototypes:
+            - uuid: e748ff9ff62643bcb071a05a1303c334
+              name: '[{#EVENTKEY}] Severity'
+              type: DEPENDENT
+              key: 'xfusion.server.alarm.SEVERITY[{#EVENTKEY}]'
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.EventKey=="{#EVENTKEY}")].Severity.first()'
+              master_item:
+                key: xfusion.server.system.getAlarmRaw
+              trigger_prototypes:
+                - uuid: 1cf5b97ca03d418ebb1fdb789d200342
+                  expression: 'last(/xFusion Server xFusionBMC Template/xfusion.server.alarm.SEVERITY[{#EVENTKEY}])="Critical"'
+                  name: '{#MESSAGE}'
+                  priority: HIGH
+                - uuid: 88c8c6d435614574b9147314aa02212d
+                  expression: 'last(/xFusion Server xFusionBMC Template/xfusion.server.alarm.SEVERITY[{#EVENTKEY}])="Warning"'
+                  name: '{#MESSAGE}'
+                  priority: WARNING
+          master_item:
+            key: xfusion.server.system.getAlarmRaw
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Parse the input JSON string into an object
+                  var alarmRaw = JSON.parse(value);
+                  
+                  // Used to store LLD result data
+                  var data = [];
+                  
+                  // Validate that the alarm data exists and is an array
+                  if (!alarmRaw || !Array.isArray(alarmRaw)) {
+                  	throw 'Alarm data is missing or invalid.';
+                  }
+                  
+                  // Iterate through each alarm object
+                  for (var i = 0; i < alarmRaw.length; i++) {
+                  	var alarmItem = alarmRaw[i];
+                  
+                  	// Extract fields from each alarm object and generate the required LLD data
+                  	data.push({
+                  		"{#EVENTTIMESTAMP}": alarmItem.EventTimestamp || "",
+                  		"{#SEVERITY}": alarmItem.Severity || "",
+                  		"{#MESSAGE}": alarmItem.Message || "",
+                  		"{#STATE}": alarmItem.State || "",
+                  		"{#HOST}": alarmItem.Host || "",
+                  		"{#EVENTID}": alarmItem.EventId || "",
+                  		"{#ID}": alarmItem.Id|| "",
+                  		"{#EVENTKEY}": alarmItem.EventKey|| ""
+                  	});
+                  }
+                  
+                  // Convert the result to a JSON string and return it
+                  return JSON.stringify({data: data});
+        - uuid: 83b34959cd71447b8fe3301b17408227
+          name: cpu.Discovery
+          type: DEPENDENT
+          key: xfusion.server.cpu.Discovery
+          lifetime: 90d
+          item_prototypes:
+            - uuid: 6fba6466e7cd431cb335f55d6ff19418
+              name: '[{#NAME}] Architecture'
+              type: DEPENDENT
+              key: 'xfusion.cpu.architecture[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Processors[?(@.Name=="{#NAME}")].Architecture.first()'
+              master_item:
+                key: xfusion.server.system.getProcessorRaw
+              tags:
+                - tag: Application
+                  value: CPU
+            - uuid: 2dfe674642584d7c93f6b49e18193ec3
+              name: '[{#NAME}] Family'
+              type: DEPENDENT
+              key: 'xfusion.cpu.family[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Processors[?(@.Name=="{#NAME}")].Family.first()'
+              master_item:
+                key: xfusion.server.system.getProcessorRaw
+              tags:
+                - tag: Application
+                  value: CPU
+            - uuid: 62e5e04568174b7e9a9d3aaa9792b604
+              name: '[{#NAME}] Manufacturer'
+              type: DEPENDENT
+              key: 'xfusion.cpu.manufacturer[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Processors[?(@.Name=="{#NAME}")].Manufacturer.first()'
+              master_item:
+                key: xfusion.server.system.getProcessorRaw
+              tags:
+                - tag: Application
+                  value: CPU
+            - uuid: 6aee64338f65408ba8699085d301bc5c
+              name: '[{#NAME}] Max Speed(MHz)'
+              type: DEPENDENT
+              key: 'xfusion.cpu.maxSpeedMHz[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Processors[?(@.Name=="{#NAME}")].MaxSpeedMHz.first()'
+              master_item:
+                key: xfusion.server.system.getProcessorRaw
+              tags:
+                - tag: Application
+                  value: CPU
+            - uuid: 5467ebb05fd44a699f03ebace5926b1e
+              name: '[{#NAME}] Model'
+              type: DEPENDENT
+              key: 'xfusion.cpu.model[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Processors[?(@.Name=="{#NAME}")].Type.first()'
+              master_item:
+                key: xfusion.server.system.getProcessorRaw
+              tags:
+                - tag: Application
+                  value: CPU
+            - uuid: 5adf983863294772a3d8e08bc5cd165c
+              name: '[{#NAME}] Serial Number'
+              type: DEPENDENT
+              key: 'xfusion.cpu.serialNumber[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Processors[?(@.Name=="{#NAME}")].SerialNumber.first()'
+              master_item:
+                key: xfusion.server.system.getProcessorRaw
+              tags:
+                - tag: Application
+                  value: CPU
+            - uuid: 4450fb6b83994755a09f71d8614bf21e
+              name: '[{#NAME}] Health'
+              type: DEPENDENT
+              key: 'xfusion.server.cpu.status[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Processors[?(@.Name=="{#NAME}")].Status.first()'
+              master_item:
+                key: xfusion.server.system.getProcessorRaw
+              tags:
+                - tag: Application
+                  value: CPU
+            - uuid: 2f6621a5f3c34bb49a6acc103e93db87
+              name: '[{#NAME}] Temperature'
+              type: DEPENDENT
+              key: 'xfusion.server.cpu.temperature[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              units: °C
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Processors[?(@.Name=="{#NAME}")].Temperature.first()'
+              master_item:
+                key: xfusion.server.system.getProcessorRaw
+              tags:
+                - tag: Application
+                  value: CPU
+                - tag: Application
+                  value: Temperature
+          master_item:
+            key: xfusion.server.system.getProcessorRaw
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Parse the input JSON string into an object
+                  var processorRaw = JSON.parse(value);
+                  
+                  // Used to store LLD result data
+                  var data = [];
+                  
+                  // Validate that the Processors field exists and is an array
+                  if (!processorRaw.Processors || !Array.isArray(processorRaw.Processors)) {
+                  	throw 'Processor data is missing or invalid.';
+                  }
+                  
+                  // Iterate through each processor object
+                  for (var i = 0; i < processorRaw.Processors.length; i++) {
+                  	var processorItem = processorRaw.Processors[i];
+                  
+                  	// Extract the Name field from each processor object and generate the required LLD data
+                  	data.push({
+                  		"{#NAME}": processorItem.Name || ""
+                  	});
+                  }
+                  
+                  // Convert the result to a JSON string and return it
+                  return JSON.stringify({data: data});
+        - uuid: a2d429be45f848349fea96247a8d393d
+          name: fan.discovery
+          type: DEPENDENT
+          key: xfusion.server.fan.discovery
+          lifetime: 90d
+          item_prototypes:
+            - uuid: c804cdb868d84bf8bdc88fcf21b8eb79
+              name: '[{#NAME}] Health'
+              type: DEPENDENT
+              key: 'xfusion.server.fan.health[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Fans[?(@.Name=="{#NAME}")].Status.first()'
+              master_item:
+                key: xfusion.server.chassis.getThermalRaw
+              tags:
+                - tag: Application
+                  value: Fan
+            - uuid: 840511832dde4bf6ace782a50126b5cf
+              name: '[{#NAME}] Model'
+              type: DEPENDENT
+              key: 'xfusion.server.fan.model[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Fans[?(@.Name=="{#NAME}")].Model.first()'
+              master_item:
+                key: xfusion.server.chassis.getThermalRaw
+              tags:
+                - tag: Application
+                  value: Fan
+            - uuid: b9deac1b59f6454f927a68f1938ff50e
+              name: '[{#NAME}] Speed Ratio'
+              type: DEPENDENT
+              key: 'xfusion.server.fan.speedRatio[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              units: '%'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Fans[?(@.Name=="{#NAME}")].SpeedRatio.first()'
+              master_item:
+                key: xfusion.server.chassis.getThermalRaw
+              tags:
+                - tag: Application
+                  value: Fan
+            - uuid: cf514da4100e43ddae98d3d0054e5f9b
+              name: '[{#NAME}] Speed'
+              type: DEPENDENT
+              key: 'xfusion.server.fan.speed[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Fans[?(@.Name=="{#NAME}")].Speed.first()'
+              master_item:
+                key: xfusion.server.chassis.getThermalRaw
+              tags:
+                - tag: Application
+                  value: Fan
+          master_item:
+            key: xfusion.server.chassis.getThermalRaw
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Parse the input JSON string into an object
+                  var fanRaw = JSON.parse(value);
+                  
+                  // Used to store LLD result data
+                  var data = [];
+                  
+                  // Validate that the Fans field exists and is an array
+                  if (!fanRaw.Fans || !Array.isArray(fanRaw.Fans)) {
+                  	throw 'Fan data is missing or invalid.';
+                  }
+                  
+                  // Iterate through each fan object
+                  for (var i = 0; i < fanRaw.Fans.length; i++) {
+                  	var fanItem = fanRaw.Fans[i];
+                  
+                  	// Extract the Name field from each fan object and generate the required LLD data
+                  	data.push({
+                  		"{#NAME}": fanItem.Name || ""
+                  	});
+                  }
+                  
+                  // Convert the result to a JSON string and return it
+                  return JSON.stringify({data: data});
+        - uuid: b57e9470791f4df7aecb810c76fed039
+          name: hardDisk.discovery
+          type: DEPENDENT
+          key: xfusion.server.hardDisk.discovery
+          lifetime: 90d
+          item_prototypes:
+            - uuid: 0e143961658b4cdda2ed3d1127bd6cf5
+              name: '[{#NAME}] Capacity InGB(GB)'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.capacityInGB[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].CapacityInGB.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 63cd9d2491ba4a339d0ffd4da0dc153b
+              name: '[{#NAME}] Device Locator'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.deviceLocator[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].DeviceLocator.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 57ae0d96682b4eb1b407d804a3c1d0b2
+              name: '[{#NAME}] Health'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.health[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Health.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 510dd4ff75024bf7a4dd83dd496e953c
+              name: '[{#NAME}] Life Used'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.lifeUsed[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              units: '%'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].LifeUsed.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 79872dcba8be419ba40f2894c3f43f64
+              name: '[{#NAME}] Manufacturer'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.manufacturer[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Manufacturer.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 4fff80bb930b419c8e618695cf703ab0
+              name: '[{#NAME}] Media Type'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.mediaType[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].MediaType.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 0f3c60eac8b443868975836b4a312d6d
+              name: '[{#NAME}] Model'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.model[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Model.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 63242954d6a64d45a39b860826c1c862
+              name: '[{#NAME}] Protocol'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.protocol[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Protocol.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: ae4849c7cd3f45c1b71360b11c601e63
+              name: '[{#NAME}] Revision'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.revision[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Revision.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 65f1ab45d43641fa803eae8991b88a6d
+              name: '[{#NAME}] Serial Number'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.serialNumber[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].SerialNumber.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+            - uuid: 78b5470cc04048c49a464a33f2921cec
+              name: '[{#NAME}] Temperature'
+              type: DEPENDENT
+              key: 'xfusion.server.hardDisk.temperature[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              units: °C
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Temperature.first()'
+              master_item:
+                key: xfusion.server.system.getHardDiskRaw
+              tags:
+                - tag: Application
+                  value: HardDisk
+                - tag: Application
+                  value: Temperature
+          master_item:
+            key: xfusion.server.system.getHardDiskRaw
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Parse the input JSON string into an object
+                  var hardDiskArray = JSON.parse(value);
+                  
+                  // Used to store LLD result data
+                  var data = [];
+                  
+                  // Validate that the parsed object is an array
+                  if (!Array.isArray(hardDiskArray)) {
+                  	throw 'HardDisk data is missing or invalid.';
+                  }
+                  
+                  // Iterate through each hard disk object
+                  for (var i = 0; i < hardDiskArray.length; i++) {
+                  	var hardDiskItem = hardDiskArray[i];
+                  
+                  	// Extract the Name field from each hard disk object and generate the required LLD data
+                  	data.push({
+                  		"{#NAME}": hardDiskItem.Name || ""
+                  	});
+                  }
+                  
+                  // Convert the result to a JSON string and return it
+                  return JSON.stringify({data: data});
+        - uuid: 6986d17b0d7c49958db5e2b55df73f4c
+          name: memory.discovery
+          type: DEPENDENT
+          key: xfusion.server.memory.discovery
+          lifetime: 90d
+          item_prototypes:
+            - uuid: 8a16eb83fd684e9ebf2ef7002f10f0c1
+              name: '[{#NAME}] Capacity(MiB)'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.capacity[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].CapacityMiB.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+            - uuid: d159a8526b724b71a947d283bdbc9a5d
+              name: '[{#NAME}] Health'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.health[{#NAME}]'
+              history: 90d
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Health.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+            - uuid: e3597ec7a1c44fbe8259802c89dfc3eb
+              name: '[{#NAME}] Manufacturer'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.manufacturer[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Manufacturer.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+            - uuid: 0d7e10d0dad9457eb350d30c423b5ce8
+              name: '[{#NAME}] Memory Device Type'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.memoryDeviceType[{#NAME}]'
+              history: 90d
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].MemoryDeviceType.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+            - uuid: ea80efae5804466a851b69061b317534
+              name: '[{#NAME}] Memory Usage Percent'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.memoryUsagePercent[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              units: '%'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].MemoryUsagePercent.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+            - uuid: 4898a15795ad4b5e858f6d7139555d11
+              name: '[{#NAME}] Operating Speed(MHz)'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.operatingSpeedMhz[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].OperatingSpeedMhz.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+            - uuid: e0ffcb9a15e443b6a29a19fcf9556c50
+              name: '[{#NAME}] Part Number'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.partNumber[{#NAME}]'
+              history: 90d
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].PartNumber.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+            - uuid: fb65323beb0c48e582b012d0cb05625b
+              name: '[{#NAME}] Serial Number'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.serialNumber[{#NAME}]'
+              history: 90d
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].SerialNumber.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+            - uuid: 4e4432694f2f4e64b80f6c1e1913ccd3
+              name: '[{#NAME}] Temperature'
+              type: DEPENDENT
+              key: 'xfusion.server.memory.temperature[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              units: ℃
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Temperature.first()'
+              master_item:
+                key: xfusion.server.system.getMemoryRaw
+              tags:
+                - tag: Application
+                  value: Memory
+                - tag: Application
+                  value: Temperature
+          master_item:
+            key: xfusion.server.system.getMemoryRaw
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Parse the input JSON string into an object
+                  var memoryArray = JSON.parse(value);
+                  
+                  // Used to store LLD result data
+                  var data = [];
+                  
+                  // Validate that the parsed object is an array
+                  if (!Array.isArray(memoryArray)) {
+                  	throw 'Memory data is missing or invalid.';
+                  }
+                  
+                  // Iterate through each memory object
+                  for (var i = 0; i < memoryArray.length; i++) {
+                  	var memoryItem = memoryArray[i];
+                  
+                  	// Extract the key field from each memory object and generate the required LLD data
+                  	data.push({
+                  		"{#NAME}": memoryItem.Name || ""
+                  	});
+                  }
+                  
+                  // Convert the result to a JSON string and return it
+                  return JSON.stringify({data: data});
+        - uuid: aee1ad08e72b4c3abac2c2038a784dc5
+          name: PCIeDevice.Discovery
+          type: DEPENDENT
+          key: xfusion.server.PCIeDevice.Discovery
+          lifetime: 90d
+          item_prototypes:
+            - uuid: b4f43f4b4a7243768ca5e1c6de8ad975
+              name: '[{#NAME}] Description'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.description[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Description.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+            - uuid: b0141210719e4bce838eb88f9c497d02
+              name: '[{#NAME}] Device Id'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.deviceId[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].DeviceId.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+            - uuid: c6efeeb282854669ac410a36935cbc7c
+              name: '[{#NAME}] Function Type'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.functionType[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].FunctionType.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+            - uuid: 0365c93680ea4dbbb02f4d33d74a3e17
+              name: '[{#NAME}] Health'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.health[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Health.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+            - uuid: 1ee747f158a545b0a658197a9c064e98
+              name: '[{#NAME}] Id'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.id[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Id.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+            - uuid: 4a79b0f7d0924fe2802faf89318119e0
+              name: '[{#NAME}] Manufacturer'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.manufacturer[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Manufacturer.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+            - uuid: 7ad025019d2846b88ab3bcbf072dd91a
+              name: '[{#NAME}] Model'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.model[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Model.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+            - uuid: 01ebd1d4be814295a48b1e82d04b83c8
+              name: '[{#NAME}] Position'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.position[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Position.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+            - uuid: b222eb936888403984ca2e0b30338baa
+              name: '[{#NAME}] Slot Number'
+              type: DEPENDENT
+              key: 'xfusion.PCIeDevice.slotNumber[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].SlotNumber.first()'
+              master_item:
+                key: xfusion.server.system.getPCIeDeviceRaw
+              tags:
+                - tag: Application
+                  value: PCIeDevice
+          master_item:
+            key: xfusion.server.system.getPCIeDeviceRaw
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Parse the input JSON string into an object
+                  var pcieDeviceArray = JSON.parse(value);
+                  
+                  // Used to store LLD result data
+                  var data = [];
+                  
+                  // Validate that the parsed object is an array
+                  if (!Array.isArray(pcieDeviceArray)) {
+                  	throw 'PCIeDevice data is missing or invalid.';
+                  }
+                  
+                  // Iterate through each PCIe device object
+                  for (var i = 0; i < pcieDeviceArray.length; i++) {
+                  	var pcieDeviceItem = pcieDeviceArray[i];
+                  
+                  	// Extract the Name field from each PCIe device object and generate the required LLD data
+                  	data.push({
+                  		"{#NAME}": pcieDeviceItem.Name || ""
+                  	});
+                  }
+                  
+                  // Convert the result to a JSON string and return it
+                  return JSON.stringify({data: data});
+        - uuid: b67e6e71874542f7b09fc0877379b4da
+          name: powerSupply.discovery
+          type: DEPENDENT
+          key: xfusion.server.powerSupply.discovery
+          lifetime: 90d
+          item_prototypes:
+            - uuid: 969b3f96028340ba9c383cf7810ec941
+              name: '[{#NAME}] Communication Status'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.communicationStatus[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].CommunicationStatus.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 5196bf01169f4895801e9f08a0614f59
+              name: '[{#NAME}] Fan Speed'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.fanSpeed[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].FanSpeed.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 4035b47af8534b4dbd83304360cbbb54
+              name: '[{#NAME}] Firmware Version'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.firmwareVersion[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].FirmwareVersion.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 0f476d5364b34aeda0cd76c8a28173a9
+              name: '[{#NAME}] Health'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.health[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Health.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: fec708e2878d4bacbac5e0e62c09a853
+              name: '[{#NAME}] Line Input Voltage(V)'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.lineInputVoltage[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].LineInputVoltage.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 8490f0293eae465e833c586d5a77455a
+              name: '[{#NAME}] Manufacturer'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.manufacturer[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Manufacturer.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 91a07c9661054839b2921a7ec9aa2ac8
+              name: '[{#NAME}] Model'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.model[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Model.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 5e0fd31a9ff84a52af8bd7b352cd1ec9
+              name: '[{#NAME}] Output Current(A)'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.outputCurrent[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].OutputCurrent.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: fb87bf588c3b4589af67316ae2b46a81
+              name: '[{#NAME}] Output Voltage(V)'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.outputVoltage[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].OutputVoltage.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 5aba0a154a1943bba62a78b1f8bd9df1
+              name: '[{#NAME}] Power Capacity(W)'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.powerCapacityWatts[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].PowerCapacityWatts.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 176e6dab40b54870b72cba75984cb1f6
+              name: '[{#NAME}] Power Output(W)'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.powerOutput[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].PowerOutput.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 1cce414e2a1d4346a67a3e7eaf236ec4
+              name: '[{#NAME}] Power Supply Type'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.powerSupplyType[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].PowerSupplyType.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 562a40fb1f324761b4e855ca265df911
+              name: '[{#NAME}] Serial Number'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.serialNumber[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].SerialNumber.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: fbdc53dcea224c13883879f9f4ed0096
+              name: '[{#NAME}] Slot Number'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.slotNumber[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].SlotNumber.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: 4e47b70b39c54e09b6f622e0287969e7
+              name: '[{#NAME}] Temperature'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.temperature[{#NAME}]'
+              history: 90d
+              value_type: FLOAT
+              trends: '0'
+              units: ℃
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].Temperature.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+            - uuid: c67166344f5147f3bae930055c5300d3
+              name: '[{#NAME}] Work Mode'
+              type: DEPENDENT
+              key: 'xfusion.server.powerSupply.workMode[{#NAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name=="{#NAME}")].WorkMode.first()'
+              master_item:
+                key: xfusion.server.system.getPowerSupplyRaw
+              tags:
+                - tag: Application
+                  value: PowerSupply
+          master_item:
+            key: xfusion.server.system.getPowerSupplyRaw
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Parse the input JSON string into an object
+                  var powerSupplyArray = JSON.parse(value);
+                  
+                  // Used to store LLD result data
+                  var data = [];
+                  
+                  // Validate that the parsed object is an array
+                  if (!Array.isArray(powerSupplyArray)) {
+                  	throw 'PowerSupply data is missing or invalid.';
+                  }
+                  
+                  // Iterate through each power supply object
+                  for (var i = 0; i < powerSupplyArray.length; i++) {
+                  	var powerSupplyItem = powerSupplyArray[i];
+                  
+                  	// Extract the Name field from each power supply object and generate the required LLD data
+                  	data.push({
+                  		"{#NAME}": powerSupplyItem.Name || ""
+                  	});
+                  }
+                  
+                  // Convert the result to a JSON string and return it
+                  return JSON.stringify({data: data});
+        - uuid: 6223793f93584e6b9845cb68ae4384d3
+          name: system.discovery
+          type: DEPENDENT
+          key: xfusion.server.system.discovery
+          lifetime: 90d
+          item_prototypes:
+            - uuid: 6d7d161b3eed4dca915ac5170975ba77
+              name: 'BIOS Firmware Information'
+              type: DEPENDENT
+              key: 'xfusion.server.system.biosVersion[{#SYSNAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].BiosVersion.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: System
+            - uuid: 3d6cac9453b74ee4a8527aa89868b9a5
+              name: 'CPU Entire Health'
+              type: DEPENDENT
+              key: 'xfusion.server.system.CPUEntireHealth[{#SYSNAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].CPUEntireStatus.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: EntireStatus
+            - uuid: 3548f11fb24b4838bb9b09af8f2f32ab
+              name: 'Product Serial Number'
+              type: DEPENDENT
+              key: 'xfusion.server.system.deviceSerialNo[{#SYSNAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].DeviceSerialNo.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: System
+              trigger_prototypes:
+                - uuid: 24e2c152d6c1434da9dcc4c45c3218d6
+                  expression: 'nodata(/xFusion Server xFusionBMC Template/xfusion.server.system.deviceSerialNo[{#SYSNAME}],300s)=1'
+                  name: 'Redfish connection abnormality.'
+                  priority: HIGH
+            - uuid: 411e9743299b4858bd9c78a5bce6bee5
+              name: 'Device UUID'
+              type: DEPENDENT
+              key: 'xfusion.server.system.deviceUUID[{#SYSNAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].SystemGuid.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: System
+            - uuid: f3f2e502f67d44c6a36b892f672da503
+              name: 'Memory Entire Health'
+              type: DEPENDENT
+              key: 'xfusion.server.system.memoryEntireHealth[{#SYSNAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].MemoryEntireStatus.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: EntireStatus
+            - uuid: 615019c59da14a1b97568a1cf9e37cb2
+              name: 'Machine Model'
+              type: DEPENDENT
+              key: 'xfusion.server.system.model[{#SYSNAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].Model.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: System
+            - uuid: 4adc47802728459bbc6acd4afd770594
+              name: 'Part Number'
+              type: DEPENDENT
+              key: 'xfusion.server.system.partNumber[{#SYSNAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].PartNumber.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: System
+            - uuid: 55b61f5d132b4d049eff5a055a18b2ab
+              name: 'System Cpu Usage'
+              type: DEPENDENT
+              key: 'xfusion.server.system.systemCpuUsage[{#SYSNAME}]'
+              history: 90d
+              value_type: FLOAT
+              units: '%'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].SystemCpuUsage.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: System
+            - uuid: ed85ab051487413bbcbd7c1d4d992a8b
+              name: 'System Health'
+              type: DEPENDENT
+              key: 'xfusion.server.system.systemHealth[{#SYSNAME}]'
+              history: 90d
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].SystemHealth.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: System
+            - uuid: 61764219e10e4f2fba30a96f54e68072
+              name: 'System Mem Usage'
+              type: DEPENDENT
+              key: 'xfusion.server.system.systemMemUsage[{#SYSNAME}]'
+              history: 90d
+              value_type: FLOAT
+              units: '%'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.SysName=="{#SYSNAME}")].SystemMemUsage.first()'
+              master_item:
+                key: xfusion.server.system.getSystemRaw
+              tags:
+                - tag: Application
+                  value: System
+          master_item:
+            key: xfusion.server.system.getSystemRaw
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Parse the input JSON string into an object
+                  var systemArray = JSON.parse(value);
+                  
+                  // Used to store LLD result data
+                  var data = [];
+                  
+                  // Validate that the parsed object is an array
+                  if (!Array.isArray(systemArray)) {
+                  	throw 'System data is missing or invalid.';
+                  }
+                  
+                  // Iterate through each system object
+                  for (var i = 0; i < systemArray.length; i++) {
+                  	var systemItem = systemArray[i];
+                  
+                  	// Extract the SysName field from each system object and generate the required LLD data
+                  	data.push({
+                  		"{#SYSNAME}": systemItem.SysName || ""
+                  	});
+                  }
+                  
+                  // Convert the result to a JSON string and return it
+                  return JSON.stringify({data: data});
+      tags:
+        - tag: target
+          value: xFusion
+      macros:
+        - macro: '{$XFUSION.HTTP.API.PASSWORD}'
+          value: '<Put your password here>'
+          description: 'The XFUSION user password.'
+        - macro: '{$XFUSION.HTTP.API.URL}'
+          value: '<Put your URL here>'
+          description: 'The XFUSION  Redfish API URL in the format `<scheme>://<host>:<port>`.'
+        - macro: '{$XFUSION.HTTP.API.USER}'
+          value: '<Put your username here>'
+          description: 'The XFUSION username.'
+        - macro: '{$XFUSION.HTTP.RETURN.CODE.OK}'
+          value: '200'
+          description: 'Set the HTTP return code that represents an OK response from the API. The default is "200", but can vary, for example, if a proxy is used.'
+  graphs:
+    - uuid: 51535d3f53a541c1bd3cd657cde2b02f
+      name: test
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: EXPLODED
+      show_3d: 'YES'
+      graph_items:
+        - color: 1A7C11
+          calc_fnc: MIN
+          item:
+            host: 'xFusion Server xFusionBMC Template'
+            key: xfusion.server.chassis.getInletTemperature
+        - sortorder: '1'
+          color: '274482'
+          calc_fnc: MIN
+          item:
+            host: 'xFusion Server xFusionBMC Template'
+            key: xfusion.server.chassis.getInletTemperature
