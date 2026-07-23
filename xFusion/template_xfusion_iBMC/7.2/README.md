@@ -6,7 +6,7 @@ I. General Information
 
     Name:     Zabbix Plugin Packsage for xFusion Server
     Function: Query, Monitoring
-    Version:  2.8.0
+    Version:  2.9.0
 
 	
 II. Description
@@ -30,8 +30,8 @@ III. Compatibility Information
       <td>Zabbix 7.2</td>
       <td>iBMC 3.03.07.09 or later</td>
       <td>
-        Rack server: 1288H V6, 2288H V6, 1288H V7, 2288H V7, 2488H V7, 2288 V7, 5288 V7, 5885H V7;<br/>
-        Heterogeneous server: G5500 V6, G5500 V7, G8600 V7;
+        Rack server: 1288H V6, 2288H V6, 1288H V7, 2288H V7, 2488H V7, 2288 V7, 5288 V7, 5885H V7, 2158H V8, 2258H V8;<br/>
+        Heterogeneous server: G5500 V6, G5500 V7, G8600 V7, G6550 V8;
       </td>
       <td>SNMP v2,SNMP v3</td>
    </tr>
