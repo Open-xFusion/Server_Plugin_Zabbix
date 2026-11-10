@@ -6,7 +6,7 @@ I. General Information
 
     Name:     Zabbix Plugin Packsage for xFusion Server
     Function: Query, Monitoring
-    Version:  2.3
+    Version:  2.8.0
 
 	
 II. Description
@@ -19,8 +19,8 @@ III. Compatibility Information
 
 <table>
    <tr>
-      <td>Managed  Object</td>
-      <td>Compatible  Zabbix Version</td>
+      <td>Managed Object</td>
+      <td>Compatible Zabbix Version</td>
       <td><span style="white-space:nowrap;">Version  Dependency&emsp;&emsp;&emsp;&emsp;</span></td>
       <td><span style="white-space:nowrap;">Hardware  Compatibility&emsp;&emsp;&emsp;</span></td>
       <td><span style="white-space:nowrap;">Interface  Protocol&emsp;&emsp;&emsp;&emsp;</span></td>

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-10T08:05:33Z'
+  date: '2023-10-26T07:19:39Z'
   groups:
     -
       uuid: 9d25945b1e5844ecaceab761619ae547
@@ -652,16 +652,25 @@ zabbix_export:
                   expression: 'last(/xFusion V5 Server iBMC Template/cpuStatus[{#SNMPVALUE}])=4'
                   name: 'cpu [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: CPU
                 -
                   uuid: b8f3010b9ff647bf8dadbfb69fb88da1
                   expression: 'last(/xFusion V5 Server iBMC Template/cpuStatus[{#SNMPVALUE}])=3'
                   name: 'cpu [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: CPU
                 -
                   uuid: 78c7f98941214faa88f9adab0cfcfdaf
                   expression: 'last(/xFusion V5 Server iBMC Template/cpuStatus[{#SNMPVALUE}])=2'
                   name: 'cpu [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: CPU
         -
           uuid: 331ecf0a800f4293b1530004c1f79789
           name: cpuType
@@ -736,16 +745,25 @@ zabbix_export:
                   expression: 'last(/xFusion V5 Server iBMC Template/fanStatus[{#SNMPVALUE}])=4'
                   name: 'fan  [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: Fan
                 -
                   uuid: ade762f80bee49ceae1bf7892dc01245
                   expression: 'last(/xFusion V5 Server iBMC Template/fanStatus[{#SNMPVALUE}])=3'
                   name: 'fan [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: Fan
                 -
                   uuid: b0db6fd6b53146c1b27a8424788ed18d
                   expression: 'last(/xFusion V5 Server iBMC Template/fanStatus[{#SNMPVALUE}])=2'
                   name: 'fan  [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: Fan
         -
           uuid: 2876cfe871aa4d21aad7a79becedbbed
           name: firmwareLocation
@@ -951,16 +969,28 @@ zabbix_export:
                   expression: 'last(/xFusion V5 Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=4'
                   name: 'hardDisk [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    -
+                      tag: Application
+                      value: HardDisk
                 -
                   uuid: 897106dc680c4fdda2f824bb3db2a880
                   expression: 'last(/xFusion V5 Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=3'
                   name: 'hardDisk [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: Application
+                      value: HardDisk
                 -
                   uuid: e2eb382a9ff548fc81fce88f87fc69aa
                   expression: 'last(/xFusion V5 Server iBMC Template/hardDiskStatus[{#SNMPVALUE}])=2'
                   name: 'hardDisk [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: Application
+                      value: HardDisk
         -
           uuid: 4ff21406465b4a0eacca55e220d2b8ef
           name: logicalDriveName
@@ -1080,6 +1110,9 @@ zabbix_export:
                   expression: 'in(last(/xFusion V5 Server iBMC Template/logicalDriveState[{#SNMPINDEX}]),2,3,6,7,8,9,10,11,12,13,14,16,17,20,21)=2'
                   name: 'logicalDrive[{#SNMPVALUE}] state minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: LogicalDrive
         -
           uuid: 78dd6d2bc8044288816a1dfbdd2ed5fb
           name: memoryClockRate
@@ -1182,16 +1215,25 @@ zabbix_export:
                   expression: 'last(/xFusion V5 Server iBMC Template/memoryStatus[{#SNMPVALUE}])=4'
                   name: 'memory [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: Memory
                 -
                   uuid: bf9e2f8b640f4d4dbd6e35f7bd4da266
                   expression: 'last(/xFusion V5 Server iBMC Template/memoryStatus[{#SNMPVALUE}])=3'
                   name: 'memory [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: Memory
                 -
                   uuid: 0ce1ea00da6440c29d4155d22bb5d362
                   expression: 'last(/xFusion V5 Server iBMC Template/memoryStatus[{#SNMPVALUE}])=2'
                   name: 'memory [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: Memory
         -
           uuid: cc6c7be2cd0d4b3b8869db201139d4c7
           name: netCardLocation
@@ -1829,16 +1871,25 @@ zabbix_export:
                   expression: 'last(/xFusion V5 Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=4'
                   name: 'powerSupply [{#SNMPVALUE}] status critical'
                   priority: DISASTER
+                  tags:
+                    - tag: Application
+                      value: PowerSupply
                 -
                   uuid: 7161c139b1dc4840bb7e42c55f0b3090
                   expression: 'last(/xFusion V5 Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=3'
                   name: 'powerSupply [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: PowerSupply
                 -
                   uuid: 85da2e5f19504850ae4d23575ccab9a4
                   expression: 'last(/xFusion V5 Server iBMC Template/powerSupplyStatus[{#SNMPVALUE}])=2'
                   name: 'powerSupply  [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: PowerSupply
         -
           uuid: 27e00b9c43ea4352ad4bf4eddd88fc66
           name: raidControllerFwVersion
@@ -1916,11 +1967,17 @@ zabbix_export:
                   expression: '(last(/xFusion V5 Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])>2 and last(/xFusion V5 Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])<16 ) or last(/xFusion V5 Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])=2'
                   name: 'raidController [{#SNMPVALUE}] status major'
                   priority: HIGH
+                  tags:
+                    - tag: Application
+                      value: RaidController
                 -
                   uuid: d50daee96c2f422496c5964755b82bb6
                   expression: 'last(/xFusion V5 Server iBMC Template/raidControllerStatus[{#SNMPVALUE}])=1'
                   name: 'raidController [{#SNMPVALUE}] status minor'
                   priority: WARNING
+                  tags:
+                    - tag: Application
+                      value: RaidController
         -
           uuid: 65ed4aa71bdf44379261e25419bdc017
           name: temperature
@@ -2285,7 +2342,7 @@ zabbix_export:
               newvalue: critical
             -
               value: '5'
-              newvalue: absebce
+              newvalue: absence
             -
               value: '6'
               newvalue: unknown
@@ -2336,7 +2393,7 @@ zabbix_export:
               newvalue: critical
             -
               value: '5'
-              newvalue: absebce
+              newvalue: absence
             -
               value: '6'
               newvalue: unknown
