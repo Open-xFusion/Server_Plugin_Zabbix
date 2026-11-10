@@ -755,16 +755,34 @@ and {change()}=1</expression>
                                     <expression>{last()}=4</expression>
                                     <name>cpu [{#SNMPVALUE}] status critical</name>
                                     <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>CPU</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=3</expression>
                                     <name>cpu [{#SNMPVALUE}] status major</name>
                                     <priority>HIGH</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>CPU</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=2</expression>
                                     <name>cpu [{#SNMPVALUE}] status minor</name>
                                     <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>CPU</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -847,16 +865,34 @@ and {change()}=1</expression>
                                     <expression>{last()}=4</expression>
                                     <name>fan  [{#SNMPVALUE}] status critical</name>
                                     <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>Fan</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=3</expression>
                                     <name>fan [{#SNMPVALUE}] status major</name>
                                     <priority>HIGH</priority>
+                                     <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>Fan</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=2</expression>
                                     <name>fan  [{#SNMPVALUE}] status minor</name>
                                     <priority>WARNING</priority>
+                                     <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>Fan</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -1079,16 +1115,34 @@ unkown</params>
                                     <expression>{last()}=4</expression>
                                     <name>hardDisk [{#SNMPVALUE}] status critical</name>
                                     <priority>DISASTER</priority>
+                                     <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>HardDisk</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=3</expression>
                                     <name>hardDisk [{#SNMPVALUE}] status major</name>
                                     <priority>HIGH</priority>
+                                     <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>HardDisk</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=2</expression>
                                     <name>hardDisk [{#SNMPVALUE}] status minor</name>
                                     <priority>WARNING</priority>
+                                     <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>HardDisk</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -1533,16 +1587,34 @@ unkown</params>
                                     <expression>{last()}=4</expression>
                                     <name>memory [{#SNMPVALUE}] status critical</name>
                                     <priority>DISASTER</priority>
+                                     <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>Memory</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=3</expression>
                                     <name>memory [{#SNMPVALUE}] status major</name>
                                     <priority>HIGH</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>Memory</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=2</expression>
                                     <name>memory [{#SNMPVALUE}] status minor</name>
                                     <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>Memory</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2243,16 +2315,34 @@ unkown</params>
                                     <expression>{last()}=4</expression>
                                     <name>powerSupply [{#SNMPVALUE}] status critical</name>
                                     <priority>DISASTER</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>PowerSupply</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=3</expression>
                                     <name>powerSupply [{#SNMPVALUE}] status major</name>
                                     <priority>HIGH</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>PowerSupply</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=2</expression>
                                     <name>powerSupply  [{#SNMPVALUE}] status minor</name>
                                     <priority>WARNING</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>PowerSupply</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2337,11 +2427,23 @@ unkown</params>
                                     <expression>({last()}&gt;2 and {last()}&lt;16 ) or {last()}=2</expression>
                                     <name>raidController [{#SNMPVALUE}] status major</name>
                                     <priority>HIGH</priority>
+                                    <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>RaidController</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}=1</expression>
                                     <name>raidController [{#SNMPVALUE}] status minor</name>
                                     <priority>WARNING</priority>
+                                     <tags>
+                                        <tag>
+                                            <tag>Application</tag>
+                                            <value>RaidController</value>
+                                        </tag>
+                                    </tags>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2878,7 +2980,7 @@ unkown</params>
                 </mapping>
                 <mapping>
                     <value>5</value>
-                    <newvalue>absebce</newvalue>
+                    <newvalue>absence</newvalue>
                 </mapping>
                 <mapping>
                     <value>6</value>
@@ -2945,7 +3047,7 @@ unkown</params>
                 </mapping>
                 <mapping>
                     <value>5</value>
-                    <newvalue>absebce</newvalue>
+                    <newvalue>absence</newvalue>
                 </mapping>
                 <mapping>
                     <value>6</value>
